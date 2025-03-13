@@ -1,0 +1,8 @@
+@charset "UTF-8";
+	.card-product{
+		transition: transform 0.2s ease-in-out;
+	}
+	
+	.card-product:hover{
+		transform: scale(1.05);
+	}

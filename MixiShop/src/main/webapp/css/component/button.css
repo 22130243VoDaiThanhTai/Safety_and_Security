@@ -1,0 +1,12 @@
+@charset "UTF-8";
+	.btn-scale{
+		transition: transform 0.2s ease-in-out;
+	}
+	
+	.btn-scale:hover{
+		transform: scale(1.05);
+	}
+	
+	.btn-radius{
+		border-radius: 18px;
+	}

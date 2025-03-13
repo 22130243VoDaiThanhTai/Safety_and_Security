@@ -1,0 +1,31 @@
+    .notification {
+        position: fixed;
+        top: 16%;
+        right: -550px;  /* Ẩn thông báo ra ngoài */
+        background-color: #f4f4f4;  /* Màu nền xám trắng */
+        color: #333;  /* Màu chữ mặc định */
+        padding: 1% 2%;
+        border-radius: 5px;
+        font-size: 16px;
+        max-width: 90%;  /* Chiều rộng linh hoạt */
+        width: 400px;  /* Chiều rộng tối đa */
+        transition: right 0.5s ease-in-out;
+        z-index: 9999;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Thêm bóng đổ */
+    }
+    
+    .notification.error {
+        background-color: #f4f4f4; /* Nền xám trắng */
+        border-left: 6px solid #dc3545; /* Thanh màu đỏ bên trái */
+        color: #dc3545; /* Màu chữ đỏ cho thông báo lỗi */
+    }
+
+    .notification.success {
+        background-color: #f4f4f4; /* Nền xám trắng */
+        border-left: 6px solid #28a745; /* Thanh màu xanh lá bên trái */
+        color: #28a745; /* Màu chữ xanh cho thông báo thành công */
+    }
+
+    .notification.show {
+        right: 0%;  /* Khi thông báo xuất hiện */
+    }

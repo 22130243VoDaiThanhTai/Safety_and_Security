@@ -1,0 +1,49 @@
+@charset "UTF-8";
+@keyframes fall {
+  0% {
+    transform: translateY(-8px);
+  }
+  50% {
+    transform: translateY(8px);
+  }
+  100% {
+    transform: translateY(-8px);
+  }
+}
+
+.falling {
+  animation: fall 2s ease-in-out infinite;
+}
+
+
+@keyframes moveTruck {
+  0% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(10px);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+.moving-truck {
+  display: inline-block;
+  animation: moveTruck 2s infinite ease-in-out;
+}
+
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.spinning {
+  animation: spin 2s linear infinite;
+}
+

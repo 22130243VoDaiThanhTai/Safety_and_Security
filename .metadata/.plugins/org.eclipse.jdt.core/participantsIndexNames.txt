@@ -1,0 +1,7 @@
+INDEX VERSION 1.134
+C:\Folder Chung\Study\For Study\Web Programing\Test\.metadata\.plugins\org.eclipse.jst.jsp.core\jspsearch\3604818603.index
+\MixiShop\src\main\java
+D:\Lap_Trinh_Web_Java\Final_Project\.metadata\.plugins\org.eclipse.jst.jsp.core\jspsearch\3604818603.index
+\MixiShop\src\main\java
+C:\Folder Chung\Study\For Study\Web Programing\Final_Project\.metadata\.plugins\org.eclipse.jst.jsp.core\jspsearch\3604818603.index
+\MixiShop\src\main\java
