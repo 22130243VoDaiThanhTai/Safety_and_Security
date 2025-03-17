@@ -17,7 +17,7 @@
 						</div>
 						<div>
 							<ul>
-								<li>Chào mừng quý khách hàng đến với website chúng tôi.</li>
+								<li>Chào mừng quý khách hàng đã đến với website chúng tôi.</li>
 								<li>Khi quý khách hàng truy cập vào trang website của chúng
 									tôi có nghĩa là quý khách đồng ý với các điều khoản này. Trang
 									web có quyền thay đổi, chỉnh sửa, thêm hoặc lược bỏ bất kỳ phần
