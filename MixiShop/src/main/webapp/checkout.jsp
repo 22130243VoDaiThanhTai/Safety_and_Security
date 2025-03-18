@@ -42,11 +42,11 @@
                     <div id="user-info">
                         <div class="form-field">
                             <label class="form-label" for="form3Example1c">Họ tên:</label> <br>
-                            <input required class="form-control" type="text" name="name" value="${user.username}" placeholder="${user.username}">
+                            <input id="form3Example1c" required class="form-control" type="text" name="name" value="${user.username}" placeholder="${user.username}">
                         </div>
                         <div class="form-field">
                             <label class="form-label" for="form3Example1c">Email:</label> <br>
-                            <input required class="form-control" type="email" name="email" value="${user.email}" placeholder="${user.email}">
+                            <input  required class="form-control" type="email" name="email" value="${user.email}" placeholder="${user.email}">
                         </div>
                     </div>
 
