@@ -21,6 +21,13 @@ public class Account {
 		this.role = role;
 		this.phone = phone;
 	}
+	public Account(String username, String password, String email, String address, String phone) {
+		this.username = username;
+		this.password = password;
+		this.email = email;
+		this.address = address;
+		this.phone = phone;
+	}
 
 
 	public Account() {}
