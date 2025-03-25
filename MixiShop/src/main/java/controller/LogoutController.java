@@ -9,6 +9,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import dao.CategoryDAO;
 import model.Category;
@@ -21,10 +22,12 @@ public class LogoutController extends HttpServlet {
 	        // Xóa session "account" để đăng xuất
 	        response.setContentType("text/html; charset=UTF-8");
 	        response.setCharacterEncoding("UTF-8");
-	    	
-	        request.getSession().removeAttribute("account");
 
-	        // Chuyển hướng người dùng về trang home
+			HttpSession session = request.getSession(false); // Tránh tạo session mới nếu chưa có
+
+			if (session != null) {
+				session.invalidate(); // Hủy toàn bộ session khi đăng xuất
+			}
 	        response.sendRedirect(request.getContextPath() + "/home");
 	    }
 	}
