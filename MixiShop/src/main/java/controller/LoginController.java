@@ -20,7 +20,7 @@ public class LoginController extends HttpServlet {
 	private CategoryDAO categoryDAO = new CategoryDAO();
 	private AccountDAO accountDAO = new AccountDAO();
 	private static final int MAX_ATTEMPTS = 5;  // Số lần nhập sai tối đa
-	private static final long LOCK_TIME_MS = TimeUnit.MINUTES.toMillis(1); // Khóa 10 phút
+	private static final long LOCK_TIME_MS = TimeUnit.MINUTES.toMillis(10); // Khóa 10 phút
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		response.setContentType("text/html; charset=UTF-8");
