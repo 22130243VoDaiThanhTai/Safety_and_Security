@@ -2,7 +2,16 @@
 	pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
+<style>
+	.card-ins {
+		transition: transform 0.3s ease-in-out;
+	}
 
+	.card-ins:hover {
+		transform: scale(1.10);
+	}
+
+</style>
 <!-- SLIDER -->
 <div id="carouselExampleIndicators" class="carousel slide"
 	data-bs-ride="carousel">
@@ -262,7 +271,7 @@
 		<div class="col-lg-3 col-sm-6 mb-4 d-flex justify-content-center">
 			<!-- NOTE images -->
 			<a href="https://www.instagram.com/p/CMM6ikxDM-r/">
-				<div class="card" style="width: 16rem;">
+				<div class="card card-ins" style="width: 16rem;">
 					<img
 						src="https://theme.hstatic.net/200000881795/1001243022/14/insta_1_img.jpg?v=137"
 						class="card-img-top" alt="" height="250">
@@ -272,7 +281,7 @@
 		<div class="col-lg-3 col-sm-6 mb-4 d-flex justify-content-center">
 			<!-- NOTE images -->
 			<a href="https://www.instagram.com/p/CMM6ikxDM-r/">
-				<div class="card" style="width: 16rem;">
+				<div class="card card-ins" style="width: 16rem;">
 					<img
 						src="https://theme.hstatic.net/200000881795/1001243022/14/insta_2_img.jpg?v=137"
 						class="card-img-top" alt="" height="250">
@@ -282,7 +291,7 @@
 		<div class="col-lg-3 col-sm-6 mb-4 d-flex justify-content-center">
 			<!-- NOTE images -->
 			<a href="https://www.instagram.com/p/CMM6ikxDM-r/">
-				<div class="card" style="width: 16rem;">
+				<div class="card card-ins" style="width: 16rem;">
 					<img
 						src="https://theme.hstatic.net/200000881795/1001243022/14/insta_4_img.jpg?v=137"
 						class="card-img-top" alt="" height="250">
@@ -292,7 +301,7 @@
 		<div class="col-lg-3 col-sm-6 mb-4 d-flex justify-content-center">
 			<!-- NOTE images -->
 			<a href="https://www.instagram.com/p/CMM6ikxDM-r/">
-				<div class="card" style="width: 16rem;">
+				<div class="card card-ins" style="width: 16rem;">
 					<img
 						src="https://theme.hstatic.net/200000881795/1001243022/14/insta_5_img.jpg?v=137"
 						class="card-img-top" alt="" height="250">
