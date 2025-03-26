@@ -11,7 +11,7 @@
 	
 	<!-- CSS -->
 	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
-	<link href="<c:url value='/css/styles.css'/>" rel="stylesheet">
+	<link href="<c:url value='/css/style.css'/>" rel="stylesheet">
 	<link href="<c:url value='/css/all.min.css'/>" rel="stylesheet">
 	<link href="<c:url value='/css/main.css'/>" rel="stylesheet">
 	<link href="<c:url value='/css/owl.carousel.min.css'/>" rel="stylesheet">
