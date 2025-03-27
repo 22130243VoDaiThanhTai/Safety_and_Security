@@ -25,6 +25,7 @@
 											<label class="form-label" for="username">Tên người
 												dùng:</label> <input type="text" id="username" class="form-control"
 												name="username" required />
+
 										</div>
 									</div>
 
@@ -33,7 +34,12 @@
 										<div data-mdb-input-init class="form-outline flex-fill mb-0">
 											<label class="form-label" for="email">Email của bạn:</label>
 											<input type="email" id="email" class="form-control"
-												name="email" required />
+												name="email" required
+											onblur="checkEmailExists(this.value)"/>
+											<span id="emailError" class="text-danger small"></span>
+											<c:if test="${not empty emailError}">
+												<span class="text-danger small">${emailError}</span>
+											</c:if>
 										</div>
 									</div>
 
@@ -49,9 +55,14 @@
 										<i class="fa-solid fa-phone fa-lg me-3 fa-fw"></i>
 										<div data-mdb-input-init class="form-outline flex-fill mb-0">
 											<label class="form-label">Số điện thoại:</label> <input type="text"
-												class="form-control" name="phone" required />
+												class="form-control" name="phone" required
+											onblur="checkPhoneExists(this.value)"/>
+											<span id="phoneError" class="text-danger small"></span>
+											<c:if test="${not empty phoneError}">
+												<span class="text-danger small">${phoneError}</span>
+											</c:if>
 										</div>
-									</div>
+										</div>
 
 									<div class="d-flex flex-row align-items-center mb-4">
 										<i class="fas fa-lock fa-lg me-3 fa-fw"></i>
