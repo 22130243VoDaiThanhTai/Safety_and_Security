@@ -221,6 +221,13 @@ public class AccountDAO {
             e.printStackTrace();
         }
     }
-    
-    
+
+
+    public boolean checkPhoneExists(String value) {
+        return false;
+    }
+
+    public boolean checkEmailExists(String value) {
+        return false;
+    }
 }
