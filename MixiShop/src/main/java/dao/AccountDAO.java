@@ -8,6 +8,7 @@ import org.mindrot.jbcrypt.BCrypt;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -120,6 +121,7 @@ public class AccountDAO {
     private String hashPassword(String password) {
         return BCrypt.hashpw(password, BCrypt.gensalt());
     }
+
     public boolean validateUser(String username, String password) {
         Account user = findUserByUsername(username);
         if (user != null) {
@@ -128,6 +130,7 @@ public class AccountDAO {
         }
         return false;
     }
+
     private Account findUserByUsername(String username) {
         Account user = null;
         String sql = "SELECT * FROM users WHERE username = ?";
@@ -181,36 +184,68 @@ public class AccountDAO {
 //        return BCrypt.hashpw(password, BCrypt.gensalt());
 //    }
 //
-    public List<Account> getAllAccount(){
-    	List<Account> listAccount = new ArrayList<Account>();
-    	try {
+    public List<Account> getAllAccount() {
+        List<Account> listAccount = new ArrayList<Account>();
+        try {
 
-			connect = DatabaseConnection.getConnection();
+            connect = DatabaseConnection.getConnection();
 
-			String sql = "select * from account";
+            String sql = "select * from account";
 
-			ps = connect.prepareStatement(sql);
+            ps = connect.prepareStatement(sql);
 
-			rs = ps.executeQuery();
+            rs = ps.executeQuery();
 
-			while (rs.next()) {
-				int id = rs.getInt(1);
-				String username = rs.getString(2);
-				String password = rs.getString(3);
-				String email = rs.getString(4);
-				String address = rs.getString(5);
-				int role = rs.getInt(6);
-				String phone = rs.getString(7);
+            while (rs.next()) {
+                int id = rs.getInt(1);
+                String username = rs.getString(2);
+                String password = rs.getString(3);
+                String email = rs.getString(4);
+                String address = rs.getString(5);
+                int role = rs.getInt(6);
+                String phone = rs.getString(7);
 
-				Account account = new Account(id, username, password, email, address, role, phone);
+                Account account = new Account(id, username, password, email, address, role, phone);
 
-				listAccount.add(account);
-			}
-		} catch (Exception e) {
-			// TODO: handle exception
-		}
-    	return listAccount;
+                listAccount.add(account);
+            }
+        } catch (Exception e) {
+            // TODO: handle exception
+        }
+        return listAccount;
     }
+    public boolean checkPhoneExists(String phone) {
+        String sql = "SELECT COUNT(*) FROM account WHERE phone = ?";
+        try {
+            connect = DatabaseConnection.getConnection();
+            ps = connect.prepareStatement(sql);
+            ps.setString(1, phone);
+            rs = ps.executeQuery();
+            return rs.next() && rs.getInt(1) > 0; // Trả về true nếu tồn tại
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        } finally {
+            closeConnections(); // Luôn đóng kết nối
+        }
+    }
+
+    public boolean checkEmailExists(String email) {
+        String sql = "SELECT COUNT(*) FROM account WHERE email = ?";
+        try {
+            connect = DatabaseConnection.getConnection();
+            ps = connect.prepareStatement(sql);
+            ps.setString(1, email);
+            rs = ps.executeQuery();
+            return rs.next() && rs.getInt(1) > 0; // Trả về true nếu tồn tại
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        } finally {
+            closeConnections(); // Luôn đóng kết nối
+        }
+    }
+
 
     private void closeConnections() {
         try {
@@ -221,13 +256,7 @@ public class AccountDAO {
             e.printStackTrace();
         }
     }
-
-
-    public boolean checkPhoneExists(String value) {
-        return false;
-    }
-
-    public boolean checkEmailExists(String value) {
-        return false;
-    }
 }
+
+
+
