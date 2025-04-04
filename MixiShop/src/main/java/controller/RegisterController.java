@@ -20,8 +20,8 @@ public class RegisterController extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         response.setContentType("text/html; charset=UTF-8");
         response.setCharacterEncoding("UTF-8");
-    	
-    	request.setAttribute("contentPage", "register.jsp");
+
+        request.setAttribute("contentPage", "register.jsp");
         RequestDispatcher dispatcher = request.getRequestDispatcher("base.jsp");
         dispatcher.forward(request, response);
     }
@@ -30,19 +30,30 @@ public class RegisterController extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         response.setContentType("text/html; charset=UTF-8");
         response.setCharacterEncoding("UTF-8");
-    	String username = request.getParameter("username");
+        String username = request.getParameter("username");
         String email = request.getParameter("email");
         String address = request.getParameter("address");
         String password = request.getParameter("password");
         String confirmPassword = request.getParameter("confirm-password");
         String phone = request.getParameter("phone");
-        
+
         // Lấy giá trị role và xử lý null
         String roleParam = request.getParameter("user-id");
         int role = (roleParam != null && !roleParam.isEmpty()) ? Integer.parseInt(roleParam) : 1;
 
         if (!password.equals(confirmPassword)) {
             request.setAttribute("errorMessage", "Mật khẩu không khớp!");
+            doGet(request, response);
+            return;
+        }
+        if (accountDAO.checkEmailExists(email)) {
+            request.setAttribute("errorMessage", "Email đã tồn tại");
+            doGet(request, response);
+            return;
+        }
+
+        if (accountDAO.checkPhoneExists(phone)) {
+            request.setAttribute("errorMessage", "Số điện thoại đã được sử dụng");
             doGet(request, response);
             return;
         }
@@ -67,3 +78,5 @@ public class RegisterController extends HttpServlet {
         }
     }
 }
+
+
