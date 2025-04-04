@@ -96,6 +96,9 @@
 									<input type="hidden" name="user-id" value="1">
 
 								</form>
+								<script>
+									const contextPath = "${pageContext.request.contextPath}";
+								</script>
 								<script src="${pageContext.request.contextPath}/js/validation.js"></script>
 
 							</div>
