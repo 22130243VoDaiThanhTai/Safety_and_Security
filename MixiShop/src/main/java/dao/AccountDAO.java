@@ -106,10 +106,24 @@ public class AccountDAO {
             ps.setString(4, hashedPassword); // Lưu mật khẩu đã mã hóa
             ps.setInt(5, account.getRole());
             ps.setString(6, account.getPhone());
-
+            System.out.println("Mật khẩu lấy từ DB: " + hashedPassword);
             return ps.executeUpdate() > 0;
 
         } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        } finally {
+            closeConnections();
+        }
+    }
+    public boolean deleteAccount(int id) {
+        String sql = "DELETE FROM account WHERE id = ?";
+        try {
+            connect = DatabaseConnection.getConnection();
+            ps = connect.prepareStatement(sql);
+            ps.setInt(1, id);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
             e.printStackTrace();
             return false;
         } finally {
