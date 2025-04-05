@@ -64,16 +64,19 @@
 			        	<table class="table table-hover">
 			        		<thead>
 							    <tr>
+									<th scope="col">ID</th>
 							      <th scope="col">Tên tài khoản</th>
 							      <th scope="col">Mật khẩu</th>
 								  <th scope="col">Địa chỉ</th>
 								  <th scope="col">Số điện thoại</th>
 								  <th scope="col">Admin</th>
+									<th scope="col">Hoạt động</th>
 								</tr>
 							</thead>
 							<tbody>
 				            <c:forEach var="account" items="${listAccount}">
 								    <tr>
+										<td>${account.id}</td>
 								      <td>${account.username}</td>
 								      <td>${account.password}</td>
 								      <td>${account.address}</td>
@@ -88,6 +91,15 @@
 										        </c:otherwise>
 										    </c:choose>
 								      </td>
+										<td>
+											<form action="deleteuser" method="post" style="display:inline;">
+												<input type="hidden" name="action" value="delete">
+												<input type="hidden" name="id" value="${account.id}">
+												<button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Bạn có chắc muốn xóa tài khoản này không?');">
+													Xóa tài khoản
+												</button>
+											</form>
+										</td>
 								    </tr>
 				            </c:forEach>
 				           	</tbody>
