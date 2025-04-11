@@ -35,6 +35,14 @@
 											<input type="password" name="password" id="form3Example4c" class="form-control" required />
 										</div>
 									</div>
+									<div class="d-flex justify-content-center mx-4 mb-3 mb-lg-4">
+										<a href="login?action=google" class="btn btn-danger btn-radius btn-scale" style="padding: 8px 30px; margin-right: 10px;">
+											<i class="fab fa-google"></i> Google
+										</a>
+										<a href="login-facebook" class="btn btn-primary btn-radius btn-scale" style="padding: 8px 30px;">
+											<i class="fab fa-facebook-f"></i> Facebook
+										</a>
+									</div>
 
 									<div class="d-flex justify-content-center mx-4 mb-3 mb-lg-4">
 										<button type="submit" data-mdb-button-init data-mdb-ripple-init class="btn btn-success btn-radius btn-scale" style="padding: 8px 50px">

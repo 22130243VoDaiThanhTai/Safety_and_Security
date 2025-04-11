@@ -55,41 +55,6 @@ public class AccountDAO {
         return null;
     }
 
-//    public synchronized Account authenticateUser(String username, String password) {
-//        try {
-//            // Mở kết nối với cơ sở dữ liệu
-//            connect = DatabaseConnection.getConnection();
-//
-//            // Truy vấn cơ sở dữ liệu để kiểm tra tài khoản và mật khẩu
-//            String sql = "SELECT * FROM account WHERE username = ? AND password = ?";
-//            ps = connect.prepareStatement(sql);
-//            ps.setString(1, username);
-//            ps.setString(2, password);
-//
-//            // Thực hiện truy vấn
-//            rs = ps.executeQuery();
-//
-//            // Nếu tìm thấy tài khoản
-//            if (rs.next()) {
-//                int id = rs.getInt("id");
-//                String email = rs.getString("email");
-//                String address = rs.getString("address");
-//                int role = rs.getInt("userID");  // Lấy giá trị role từ cơ sở dữ liệu
-//                String phone = rs.getString("phone");
-//
-//                // Trả về đối tượng Account với tất cả các thuộc tính
-//                return new Account(id, username, password, email, address, role, phone);
-//            }
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        } finally {
-//            // Đảm bảo đóng kết nối khi xong
-//            closeConnections();
-//        }
-//
-//        // Trả về null nếu không tìm thấy tài khoản
-//        return null;
-//    }
 
     public boolean registerUser(Account account) {
         String sql = "INSERT INTO account(username, email, address, password, userID, phone) VALUES (?, ?, ?, ?, ?, ?)";
@@ -147,7 +112,7 @@ public class AccountDAO {
 
     private Account findUserByUsername(String username) {
         Account user = null;
-        String sql = "SELECT * FROM users WHERE username = ?";
+        String sql = "SELECT * FROM account WHERE username = ?";
 
         try {
             connect = DatabaseConnection.getConnection();
@@ -171,33 +136,34 @@ public class AccountDAO {
         return user; // Trả về user hoặc null nếu không tìm thấy
     }
 
-    //    public boolean registerUser(Account account) {
-//        String sql = "INSERT INTO account(username, email, address, password, userID, phone) VALUES (?, ?, ?, ?, ?,	?)";
-//        try {
-//            connect = DatabaseConnection.getConnection();
-//            ps = connect.prepareStatement(sql);
-//
-//            ps.setString(1, account.getUsername());
-//            ps.setString(2, account.getEmail());
-//            ps.setString(3, account.getAddress());
-//            ps.setString(4, account.getPassword());
-//            ps.setInt(5, account.getRole());
-//            ps.setString(6, account.getPhone());
-//
-//
-//            return ps.executeUpdate() > 0;
-//
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            return false;
-//        } finally {
-//            closeConnections();
-//        }
-//    }
-//    private String hashPassword(String password) {
-//        return BCrypt.hashpw(password, BCrypt.gensalt());
-//    }
-//
+    public Account findUserByEmail(String email) {
+        String sql = "SELECT * FROM account WHERE email = ?";
+        try {
+            connect = DatabaseConnection.getConnection();
+            ps = connect.prepareStatement(sql);
+            ps.setString(1, email);
+            rs = ps.executeQuery();
+            if (rs.next()) {
+                return new Account(
+                        rs.getInt("id"),
+                        rs.getString("username"),
+                        rs.getString("password"),
+                        email,
+                        rs.getString("address"),
+                        rs.getInt("userID"),
+                        rs.getString("phone")
+                );
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            closeConnections();
+        }
+        return null;
+    }
+
+
+
     public List<Account> getAllAccount() {
         List<Account> listAccount = new ArrayList<Account>();
         try {
