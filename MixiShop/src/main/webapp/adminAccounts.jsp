@@ -30,6 +30,19 @@
         background-color: #000;  /* Màu nền khi hover */
         color: #fff;             /* Màu chữ khi hover */
     }
+	.active{
+		display: flex;
+	}
+	.btn{
+		border-radius: 8px
+	}
+	.delete_btn{
+		padding-right: 10px;
+	}
+	table.table td, table.table th {
+		white-space: nowrap; /* Không xuống dòng */
+		vertical-align: middle;
+	}
 </style>
 <body>
 	<c:if test="${not empty message}">
@@ -58,6 +71,25 @@
           <!-- Nội dung chính (chiếm 9 cột) -->
           <div class="col-md-9 p-4 text-center">
             <h1>Danh sách tài khoản</h1><br>
+			  <div id="editForm" class="hidden mt-3">
+				  <form action="update_user" method="post" class="border p-3 rounded bg-light">
+					  <input type="hidden" id="userId" name="user_id"> <!-- ID người dùng -->
+
+					  <div class="mb-3">
+						  <label for="role" class="form-label">Quyền:</label>
+						  <select id="role" name="role_id" class="form-select" required>
+							  <option value="0">Admin</option>
+							  <option value="1">User</option>
+						  </select>
+					  </div>
+
+					  <button type="submit" class="btn btn-success">Cập nhật</button>
+					  <button type="button" class="btn btn-secondary" id="cancelEdit">Hủy</button>
+				  </form>
+			  </div>
+
+
+
 			<c:choose>
 			    <c:when test="${not empty listAccount}">
 			        <div class="row justify-content-start">
@@ -91,14 +123,23 @@
 										        </c:otherwise>
 										    </c:choose>
 								      </td>
-										<td>
-											<form action="deleteuser" method="post" style="display:inline;">
+										<td class="d-flex gap-2">
+											<!-- Nút xóa -->
+											<form class="delete_btn" action="deleteuser" method="post" style="display:inline;">
 												<input type="hidden" name="action" value="delete">
 												<input type="hidden" name="id" value="${account.id}">
 												<button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Bạn có chắc muốn xóa tài khoản này không?');">
-													Xóa tài khoản
+													Xóa
 												</button>
 											</form>
+
+											<!-- Nút sửa quyền -->
+											<button style="background: #4a90e2" type="button"
+													class="btn btn-warning btn-sm btn-edit"
+													data-id="${account.id}"
+													data-role="${account.role}">
+												Sửa
+											</button>
 										</td>
 								    </tr>
 				            </c:forEach>
@@ -117,4 +158,39 @@
           </div>
         </div>
     </div>
+	<script>
+		document.addEventListener("DOMContentLoaded", () => {
+			const editForm = document.getElementById("editForm");
+			const userIdInput = document.getElementById("userId");
+			const roleInput = document.getElementById("role");
+			const cancelEdit = document.getElementById("cancelEdit");
+
+			// Gán sự kiện cho tất cả nút sửa
+			document.querySelectorAll(".btn-edit").forEach((btn) => {
+				btn.addEventListener("click", () => {
+					const userId = btn.getAttribute("data-id");
+					const role = btn.getAttribute("data-role");
+
+					// Gán dữ liệu vào form
+					userIdInput.value = userId;
+					roleInput.value = role;
+
+					// Hiển thị form
+					editForm.classList.remove("hidden");
+
+					// Cuộn xuống form
+					editForm.scrollIntoView({ behavior: "smooth" });
+				});
+			});
+
+			// Hủy chỉnh sửa
+			cancelEdit.addEventListener("click", () => {
+				editForm.classList.add("hidden");
+				userIdInput.value = "";
+				roleInput.value = "1"; // Mặc định là User
+			});
+		});
+	</script>
+
+
 </body>

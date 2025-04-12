@@ -228,6 +228,19 @@ public class AccountDAO {
             closeConnections(); // Luôn đóng kết nối
         }
     }
+    public void updateUserRole(int userId, int roleId) {
+        String sql = "UPDATE account SET userID = ? WHERE id = ?";
+        try {
+            connect = DatabaseConnection.getConnection();
+            ps = connect.prepareStatement(sql);
+            ps.setInt(1, roleId);
+            ps.setInt(2, userId);
+            ps.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
 
 
     private void closeConnections() {
