@@ -57,6 +57,11 @@ public class RegisterController extends HttpServlet {
             doGet(request, response);
             return;
         }
+        if (!isValidPhoneNumber(phone)) {
+            request.setAttribute("errorMessage", "Số điện thoại không hợp lệ");
+            doGet(request, response);
+            return;
+        }
 
         // Tạo đối tượng Account mới và thiết lập giá trị cho các thuộc tính
         Account account = new Account();
@@ -77,6 +82,11 @@ public class RegisterController extends HttpServlet {
             doGet(request, response);
         }
     }
-}
+    private boolean isValidPhoneNumber(String phone) {
+        if (phone == null) return false;
+        return phone.matches("^(0)(\\d{9,10})$");
+    }
+    }
+
 
 

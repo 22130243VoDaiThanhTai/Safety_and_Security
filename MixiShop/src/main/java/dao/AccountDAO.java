@@ -195,6 +195,9 @@ public class AccountDAO {
         return listAccount;
     }
     public boolean checkPhoneExists(String phone) {
+        if (!phone.matches("^0\\d{9}$")) {
+            return false;
+        }
         String sql = "SELECT COUNT(*) FROM account WHERE phone = ?";
         try {
             connect = DatabaseConnection.getConnection();

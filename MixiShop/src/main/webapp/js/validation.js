@@ -34,14 +34,25 @@ function checkEmailExists(email) {
         });
 }
 
-// Hàm kiểm tra số điện thoại (phiên bản đã sửa)
+/// Hàm kiểm tra số điện thoại (cập nhật code)
 function checkPhoneExists(phone) {
     const phoneError = document.getElementById('phoneError');
     if (!phoneError) return;
 
     phoneError.textContent = '';
 
-    if (!phone) return;
+    // First validate format
+    if (!phone) {
+        phoneError.textContent = 'Vui lòng nhập số điện thoại';
+        phoneError.style.color = 'red';
+        return;
+    }
+
+    if (!isValidPhoneNumber(phone)) {
+        phoneError.textContent = '✖ Số điện thoại không hợp lệ';
+        phoneError.style.color = 'red';
+        return;
+    }
 
     phoneError.textContent = 'Đang kiểm tra...';
     phoneError.style.color = 'gray';
@@ -49,7 +60,7 @@ function checkPhoneExists(phone) {
     fetch(`${contextPath}/check-existence?type=phone&value=${encodeURIComponent(phone)}`)
         .then(response => {
             if (!response.ok) throw new Error(`HTTP ${response.status}`);
-            return response.json(); // ⚠️ Quan trọng: phải có return
+            return response.json();
         })
         .then(data => {
             phoneError.textContent = data.exists
@@ -64,7 +75,21 @@ function checkPhoneExists(phone) {
         });
 }
 
-// Xử lý form submit (phiên bản an toàn)
+function isValidPhoneNumber(phone) {
+    const phoneRegex = /^0\d{9}$/; // Exactly 10 digits starting with 0
+    return phoneRegex.test(phone);
+}
+// Thêm event listener cho trường phone
+document.addEventListener('DOMContentLoaded', function() {
+    const phoneInput = document.getElementById('phone');
+    if (phoneInput) {
+        phoneInput.addEventListener('blur', function() {
+            checkPhoneExists(this.value);
+        });
+    }
+});
+
+// Xử lý form submit
 document.addEventListener('DOMContentLoaded', function() {
     const form = document.getElementById('registerForm');
     if (!form) return;
