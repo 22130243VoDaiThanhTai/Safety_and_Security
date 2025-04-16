@@ -36,7 +36,7 @@ public class AccountDAO {
                 String hashedPassword = rs.getString("password"); // Lấy mật khẩu đã mã hóa
                 String email = rs.getString("email");
                 String address = rs.getString("address");
-                int role = rs.getInt("userID");
+                int role = rs.getInt("role");
                 String phone = rs.getString("phone");
 
                 // Kiểm tra mật khẩu nhập vào có khớp với mật khẩu đã mã hóa hay không
@@ -57,7 +57,7 @@ public class AccountDAO {
 
 
     public boolean registerUser(Account account) {
-        String sql = "INSERT INTO account(username, email, address, password, userID, phone) VALUES (?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO account(username, email, address, password, role, phone) VALUES (?, ?, ?, ?, ?, ?)";
         try {
             connect = DatabaseConnection.getConnection();
             ps = connect.prepareStatement(sql);
@@ -136,6 +136,7 @@ public class AccountDAO {
         return user; // Trả về user hoặc null nếu không tìm thấy
     }
 
+    // Tìm tài khoản theo email
     public Account findUserByEmail(String email) {
         String sql = "SELECT * FROM account WHERE email = ?";
         try {
@@ -150,7 +151,7 @@ public class AccountDAO {
                         rs.getString("password"),
                         email,
                         rs.getString("address"),
-                        rs.getInt("userID"),
+                        rs.getInt("role"),
                         rs.getString("phone")
                 );
             }
@@ -159,8 +160,43 @@ public class AccountDAO {
         } finally {
             closeConnections();
         }
-        return null;
+        return null;  // Nếu không tìm thấy tài khoản
     }
+    private boolean isAccountExist(String email) {
+        String sql = "SELECT COUNT(*) FROM account WHERE email = ?";
+        try (Connection connect = DatabaseConnection.getConnection();
+             PreparedStatement ps = connect.prepareStatement(sql)) {
+            ps.setString(1, email);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next() && rs.getInt(1) > 0) {
+                    return true; // Tài khoản đã tồn tại
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    // Đăng ký tài khoản mới khi đăng nhập bằng Google
+    public void registerGoogleUser(Account acc) {
+        String sql = "INSERT INTO account (email, username, role) VALUES (?, ?, ?)";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, acc.getEmail());
+            ps.setString(2, acc.getUsername());
+            ps.setInt(3, acc.getRole());
+
+            ps.executeUpdate();
+
+        } catch (SQLException e) {
+            e.printStackTrace(); // hoặc log ra logger
+        }
+    }
+
+
+
 
 
 
