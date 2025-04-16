@@ -1,5 +1,7 @@
 package controller;
 
+import model.Account;
+import dao.AccountDAO;
 import org.json.JSONObject;
 
 import javax.servlet.ServletException;
@@ -15,7 +17,7 @@ import java.util.stream.Collectors;
 public class GoogleCallbackController extends HttpServlet {
 
     private static final String CLIENT_ID = "907964223254-9j5im6uvq8ic45o8569o2bt40kkivam3.apps.googleusercontent.com";
-    private static final String CLIENT_SECRET = "G0CSPX-5c9HYy7mRt745bpYnUdXrQ4AGJ1d";
+    private static final String CLIENT_SECRET = "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";
     private static final String REDIRECT_URI = "http://localhost:8080/oauth2callback";
 
     @Override
@@ -50,7 +52,6 @@ public class GoogleCallbackController extends HttpServlet {
         try (BufferedReader in = new BufferedReader(new InputStreamReader(tokenConn.getInputStream()))) {
             tokenResponse = in.lines().collect(Collectors.joining());
         } catch (IOException e) {
-            // Đọc lỗi chi tiết từ Google
             String errorMsg;
             try (BufferedReader errorReader = new BufferedReader(new InputStreamReader(tokenConn.getErrorStream()))) {
                 errorMsg = errorReader.lines().collect(Collectors.joining());
@@ -74,11 +75,27 @@ public class GoogleCallbackController extends HttpServlet {
         String email = userJson.getString("email");
         String name = userJson.getString("name");
 
-        // Tạo session và lưu thông tin người dùng
-        HttpSession session = request.getSession();
-        session.setAttribute("userEmail", email);
-        session.setAttribute("userName", name);
+        // Kiểm tra xem người dùng đã có tài khoản trong cơ sở dữ liệu chưa
+        AccountDAO accountDAO = new AccountDAO();
+        Account existingAccount = accountDAO.findUserByEmail(email);
 
-        response.sendRedirect("home.jsp");
+        if (existingAccount == null) {
+            // Tạo tài khoản mới nếu chưa có
+            Account newAccount = new Account();
+            newAccount.setEmail(email);
+            newAccount.setUsername(name); // Hoặc set username nếu cần
+            newAccount.setRole(1); // Role mặc định hoặc theo yêu cầu (0: Admin, 1: User)
+
+            // Lưu tài khoản mới vào database
+            accountDAO.registerGoogleUser(newAccount);
+            existingAccount = newAccount; // Cập nhật tài khoản mới tạo vào session
+        }
+
+        // Lưu thông tin vào session
+        HttpSession session = request.getSession();
+        session.setAttribute("account", existingAccount);
+
+        // Chuyển về trang chủ
+        response.sendRedirect(request.getContextPath() + "/home");
     }
 }
