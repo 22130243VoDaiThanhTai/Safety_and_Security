@@ -1,6 +1,7 @@
 package controller;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,6 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import dao.CategoryDAO;
+import dao.OrderDao;
 import dao.ProductDAO;
 import model.Account;
 import model.Cart;
@@ -26,7 +28,7 @@ public class CheckoutController extends HttpServlet {
     private ProductDAO productDAO = new ProductDAO();
     private CategoryDAO categoryDAO = new CategoryDAO();
     String cancelOrder = "Hủy đơn hàng";
-    
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         // Đặt mã hóa UTF-8 cho HTTP response
@@ -56,12 +58,36 @@ public class CheckoutController extends HttpServlet {
         // Đặt mã hóa UTF-8 cho HTTP response
         response.setContentType("text/html; charset=UTF-8");
         response.setCharacterEncoding("UTF-8");
-
         String name = request.getParameter("name");
+        String email = request.getParameter("email");
         String address = request.getParameter("address");
         String phone = request.getParameter("phone");
         HttpSession session = request.getSession();
         Cart cart = (Cart) session.getAttribute("cart");
+        Account account = (Account) request.getSession().getAttribute("account");
+        int userId = account.getId();
+        // tạo đơn hàng
+        String[] productIds = request.getParameterValues("productId");
+        String[] quantities = request.getParameterValues("quantity");
+        String[] prices = request.getParameterValues("price");
+        double totalPrice = cart.getTotal();
+        OrderDao orderDao = new OrderDao();
+        try {
+            int orderId = orderDao.createOrder(userId,email,phone,address,totalPrice);
+            for (int i = 0; i < productIds.length; i++) {
+                int productId = Integer.parseInt(productIds[i]);
+                int quantity = Integer.parseInt(quantities[i]);
+                int price = Integer.parseInt(prices[i]);
+                System.out.println("Sản phẩm ID: " + productId + ", Số lượng: " + quantity +", price: " + price);
+                orderDao.addOrderDetail(orderId,productId,quantity,price);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+
+        //kết thúc tạo đơn hàng
+
 
         if (cart == null || cart.getCount() == 0) {
             response.sendRedirect("cart");
@@ -69,11 +95,13 @@ public class CheckoutController extends HttpServlet {
         }
 
         try {
+
+
             Order order = new Order(cart, name, address, phone);
             order.setStatus("Pending"); // Trạng thái ban đầu
 
             order.updateStatus();
-            
+
             List<Order> orders = (List<Order>) session.getAttribute("orders");
 
             if (orders == null) {
@@ -82,7 +110,7 @@ public class CheckoutController extends HttpServlet {
 
             orders.add(order);
             session.setAttribute("orders", orders);
-            
+
             if (order.getStatus().equals(cancelOrder)) {
                 // Lặp qua các item trong đơn hàng và phục hồi số lượng sản phẩm
                 for (Item item : order.getItems()) {
@@ -100,7 +128,7 @@ public class CheckoutController extends HttpServlet {
                     }
                 }
             }
-            
+
 
             cart.clear();
 
