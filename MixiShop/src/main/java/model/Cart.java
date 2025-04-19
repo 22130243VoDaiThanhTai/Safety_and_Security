@@ -22,7 +22,7 @@ public class Cart {
             Item scitem = items.get(id);
             scitem.incrementQuantity();
         } else {
-            Item newItem = new Item(product, 1);
+            Item newItem = new Item(product, 1,product.getPrice());
             items.put(id, newItem);
         }
     }

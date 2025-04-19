@@ -16,6 +16,7 @@
                 <hr>
                 
                     <div class="cart-row d-flex justify-content-between">
+                        <div style="flex:1"><strong>ID</strong></div>
                         <div style="flex:2"><strong>Hình ảnh</strong></div>
                         <div style="flex:3"><strong>Tên sản phẩm</strong></div>
                         <div style="flex:1"><strong>Số lượng</strong></div>
@@ -24,6 +25,7 @@
                                     
                 <c:forEach var="item" items="${cart.items}">
                     <div class="cart-row">
+                        <div style="flex:3"><strong>${item.product.id}</strong></div>
                         <div style="flex:2"><img class="row-image" src="<c:url value='/images/${item.product.image}'/>" alt="${item.product.name}"></div>
                         <div style="flex:3"><strong>${item.product.name}</strong></div>
 
@@ -66,7 +68,13 @@
                     </div>
 
                     <hr>
-                    <button id="form-button" class="btn btn-success btn-radius" style="width: 100%" type="submit"><i class="fa-solid fa-truck-fast"></i> Đặt Hàng</button>
+                    <c:forEach var="item" items="${cart.items}">
+                        <input type="hidden" name="productId" value="${item.product.id}" />
+                        <input type="hidden" name="quantity" value="${item.quantity}" />
+                        <input type="hidden" name="price" value="${item.price}" />
+                    </c:forEach>
+                    <button id="form-button" class="btn btn-success btn-radius" style="width: 100%" type="submit">
+                        <i class="fa-solid fa-truck-fast"></i> Đặt Hàng</button>
                     <br>
 
                 </form>
