@@ -37,6 +37,7 @@
                 <br>
                 <div class="box-element">
                     <div class="cart-row d-flex justify-content-between">
+                        <div style="flex:1;display: none"><strong>ID</strong></div>
                         <div style="flex:1"><strong>Hình ảnh</strong></div>
                         <div style="flex:2"><strong>Tên Sản phẩm</strong></div>
                         <div style="flex:1"><strong>Giá</strong></div>
@@ -47,6 +48,7 @@
 
                     <c:forEach var="item" items="${cart.items}">
                         <div class="cart-row d-flex justify-content-between">
+                            <div style="flex:1;display: none"><strong>${item.product.id}</strong></div>
                             <div style="flex:1"><img class="row-image" src="<c:url value='/images/${item.product.image}'/>" alt="${item.product.name}"></div>
                             <div style="flex:2"><strong>${item.product.name}</strong></div>
                             <div style="flex:1"><strong><fmt:formatNumber value="${item.product.price}" pattern="#,###"/> VNĐ</strong></div>

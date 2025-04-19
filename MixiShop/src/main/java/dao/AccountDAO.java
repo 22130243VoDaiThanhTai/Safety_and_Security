@@ -265,7 +265,7 @@ public class AccountDAO {
         }
     }
     public void updateUserRole(int userId, int roleId) {
-        String sql = "UPDATE account SET userID = ? WHERE id = ?";
+        String sql = "UPDATE account SET role = ? WHERE id = ?";
         try {
             connect = DatabaseConnection.getConnection();
             ps = connect.prepareStatement(sql);
