@@ -3,13 +3,15 @@ package model;
 public class OrderDetail {
     private int productId;
     private String productName;
+    private String image;
     private int quantity;
     private int price;
     // Getters, setters...
 
-    public OrderDetail(int productId, String productName, int quantity, int price) {
+    public OrderDetail(int productId, String productName,String image, int quantity, int price) {
         this.productId = productId;
         this.productName = productName;
+        this.image = image;
         this.quantity = quantity;
         this.price = price;
     }
@@ -31,6 +33,12 @@ public class OrderDetail {
 
     public void setProductName(String productName) {
         this.productName = productName;
+    }
+    public String getImage() {
+        return image;
+    }
+    public void setImage(String image) {
+        this.image = image;
     }
 
     public int getQuantity() {

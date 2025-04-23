@@ -1,6 +1,8 @@
 package controller;
 
 import java.io.IOException;
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -13,6 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import dao.OrderDao;
 import dao.ProductDAO;
 import model.Account;
 import model.Cart;
@@ -25,12 +28,13 @@ public class OrdersController extends HttpServlet {
     String receivedOrder = "Đã nhận hàng";
     String cancelOrder = "Hủy đơn hàng";
 	private ProductDAO productDAO = new ProductDAO();
+    private OrderDao orderDao = new OrderDao();
 	
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         response.setContentType("text/html; charset=UTF-8");
         response.setCharacterEncoding("UTF-8");
-    	
-    	HttpSession session = request.getSession();
+
+        HttpSession session = request.getSession();
         Account account = (Account) session.getAttribute("account");
 
         // Kiểm tra xem người dùng đã đăng nhập chưa
@@ -38,13 +42,17 @@ public class OrdersController extends HttpServlet {
             response.sendRedirect("login");
             return;
         }
-
         // Lấy danh sách đơn hàng từ session
         List<Order> orders = (List<Order>) session.getAttribute("orders");
-
+//        List<Order> orders = null;
+//        try {
+//            orders = (List<Order>) orderDao.getOrderByUser(account.getId());
+//        } catch (SQLException e) {
+//            throw new RuntimeException(e);
+//        }
         // Nếu danh sách đơn hàng không có, thông báo không có đơn hàng
         if (orders == null || orders.isEmpty()) {
-        	session.setAttribute("notification", "<strong><i class=\"fa-solid fa-face-frown text-danger\"></i> Hiện tại chưa có đơn hàng nào :(</strong>");
+            session.setAttribute("notification", "<strong><i class=\"fa-solid fa-face-frown text-danger\"></i> Hiện tại chưa có đơn hàng nào :(</strong>");
             session.setAttribute("notificationType", "error");
             request.setAttribute("message", "Không có đơn hàng nào.");
         } else {
@@ -55,12 +63,8 @@ public class OrdersController extends HttpServlet {
                     return Integer.compare(o2.getOrderId(), o1.getOrderId()); // Giảm dần
                 }
             });
-        }       
-
-        // Truyền danh sách đơn hàng vào request
+        }
         request.setAttribute("orders", orders);
-
-        // Chuyển đến trang orders.jsp
         request.setAttribute("contentPage", "orders.jsp");
         RequestDispatcher dispatcher = request.getRequestDispatcher("base.jsp");
         dispatcher.forward(request, response);

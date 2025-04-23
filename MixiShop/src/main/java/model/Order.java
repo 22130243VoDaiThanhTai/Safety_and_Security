@@ -22,6 +22,18 @@ public class Order {
     private String status;
     private boolean isConfirmed;
 
+    public Order(int orderId, int userId, String email, List<Item> items, String address, String phoneNumber, Date orderDate, double total, String status) {
+        this.orderId = orderId;
+        this.userId = userId;
+        this.email = email;
+        this.items = items;
+        this.address = address;
+        this.phoneNumber = phoneNumber;
+        this.orderDate = orderDate;
+        this.total = total;
+        this.status = "Pending";
+    }
+
     // Constructor
     public Order(Cart cart, String nameUser, String address, String phoneNumber) {
         this.orderId = ++orderCount;

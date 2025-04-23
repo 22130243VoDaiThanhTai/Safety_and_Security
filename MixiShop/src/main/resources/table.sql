@@ -26,3 +26,26 @@ CREATE TABLE account (
                          role INT,
                          phone VARCHAR(15)
 );
+-- Bảng lưu thông tin đơn hàng
+CREATE TABLE orders (
+                        id INT AUTO_INCREMENT PRIMARY KEY,
+                        user_id INT NOT NULL,
+                        email VARCHAR(255),
+                        phone VARCHAR(15),
+                        address VARCHAR(255),
+                        total_price DOUBLE NOT NULL,
+                        status VARCHAR(20) DEFAULT 'PENDING',
+                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                        FOREIGN KEY (user_id) REFERENCES account(id)
+);
+
+-- Bảng chi tiết đơn hàng
+CREATE TABLE order_details (
+                               id INT AUTO_INCREMENT PRIMARY KEY,
+                               order_id INT NOT NULL,
+                               product_id INT NOT NULL,
+                               quantity INT NOT NULL,
+                               price DOUBLE NOT NULL,
+                               FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE,
+                               FOREIGN KEY (product_id) REFERENCES product(id)
+);

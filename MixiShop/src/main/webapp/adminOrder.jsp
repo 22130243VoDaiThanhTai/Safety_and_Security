@@ -103,6 +103,7 @@
                                 <th scope="col">Tổng tiền</th>
                                 <th scope="col">Ngày đặt</th>
                                 <th scope="col">Thao tác</th>
+                                <th scope="col">Xác nhận</th>
                             </tr>
                             </thead>
                             <tbody>
@@ -121,6 +122,12 @@
                                         <!-- Có thể thêm nút xem chi tiết đơn hàng -->
                                         <a href="javascript:void(0)" class="btn btn-info btn-sm btn-detail" data-order-id="${order.orderId}">
                                             Chi tiết
+                                        </a>
+                                    </td>
+                                    <td>
+                                        <!-- Có thể thêm nút xem chi tiết đơn hàng -->
+                                        <a href="" class="btn btn-info btn-sm" data-order-id="${order.orderId}">
+                                            Xác nhận
                                         </a>
                                     </td>
                                 </tr>
@@ -155,6 +162,7 @@
                     <tr>
                         <th>Mã sản phẩm</th>
                         <th>Tên sản phẩm</th>
+                        <th>ảnh sản phẩm</th>
                         <th>Số lượng</th>
                         <th>Giá</th>
                     </tr>
@@ -168,65 +176,7 @@
     </div>
 </div>
 
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const detailButtons = document.querySelectorAll(".btn-detail");
-
-        detailButtons.forEach(button => {
-            button.addEventListener("click", function () {
-                const orderId = this.getAttribute("data-order-id");
-                if (!orderId) {
-                    console.error("Không có orderId!");
-                    return;  // Dừng lại nếu không có orderId
-                }else{
-                    console.log("có"+ orderId)
-                }
-                fetch(`${window.location.origin}/MixiShop_war/getOrderDetail?orderId=9`)
-                    .then(response => {
-                        console.log('Response:', response);  // Log để kiểm tra phản hồi
-                        if (!response.ok) {
-                            return response.text().then(text => {
-                                throw new Error(`Lỗi khi tải chi tiết đơn hàng. Mã lỗi: ${response.status}, Nội dung lỗi: ${text}`);
-                            });
-                        }
-                        return response.json();  // Nếu thành công, chuyển thành JSON
-                    })
-                    .then(data => {
-                        console.log('Dữ liệu chi tiết đơn hàng:', data);  // Kiểm tra dữ liệu trả về từ API
-                        const tbody = document.getElementById("orderDetailBody");
-                        const modalOrderId = document.getElementById("modalOrderId");
-                        tbody.innerHTML = "";
-                        modalOrderId.textContent = orderId;
-                        console.log(Array.isArray(data)); // Phải trả ra true
-
-                        data.forEach(function(item)  {
-                            console.log("Item :", item); // Xem log có ra không
-                            console.log(typeof item);    // Xem có phải object không
-                            console.log("Item id :", item.productId);
-                            console.log("Item name :", item.productName);
-                            console.log("Item quantity :", item.quantity);
-                            console.log("Item price :", item.price);
-                            const row = `
-                            <tr>
-                                <td>${item.productId}</td>
-                                <td>${item.productName}</td>
-                                <td>${item.quantity}</td>
-                                <td>${item.price}</td>
-                            </tr>`;
-                            tbody.innerHTML += row;
-                        });
-
-                        const modal = new bootstrap.Modal(document.getElementById('orderDetailModal'));
-                        modal.show();
-                    })
-                    .catch(error => {
-                        console.error("Lỗi khi tải chi tiết đơn hàng:", error);
-                        alert("Không thể tải chi tiết đơn hàng. Mã lỗi: " + error.message);
-                    });
-            });
-        });
-    });
-</script>
+<script src="js/adminOrderDetails.js"></script>
 <%--còn lỗi lấy orderId với lỗi hiển thị đơn hàng chi tiết--%>
 
 </body>
