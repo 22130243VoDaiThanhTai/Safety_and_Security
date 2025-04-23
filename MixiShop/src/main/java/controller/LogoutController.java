@@ -26,7 +26,8 @@ public class LogoutController extends HttpServlet {
 			HttpSession session = request.getSession(false); // Tránh tạo session mới nếu chưa có
 
 			if (session != null) {
-				session.removeAttribute("account"); // Hủy toàn bộ session khi đăng xuất
+				session.invalidate();
+//				session.removeAttribute("account"); // Hủy toàn bộ session khi đăng xuất
 			}
 	        response.sendRedirect(request.getContextPath() + "/home");
 	    }

@@ -1,8 +1,12 @@
 package dao;
 
 import database.DatabaseConnection;
+import model.Order;
+import model.OrderDetail;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class OrderDao {
     Connection connect = null;
@@ -52,4 +56,84 @@ public class OrderDao {
         }
         return false;
     }
+    public List<Order> getAllOrder() throws SQLException {
+        List<Order> orders = new ArrayList<>();
+        String sql = "SELECT * FROM orders";
+        try {
+            connect = DatabaseConnection.getConnection();
+            ps = connect.prepareStatement(sql);
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                Order order = new Order();
+                order.setOrderId(rs.getInt("id"));
+                order.setUserId(rs.getInt("user_id"));
+                order.setEmail(rs.getString("email"));
+                order.setPhoneNumber(rs.getString("phone"));
+                order.setAddress(rs.getString("address"));
+                order.setTotal(rs.getDouble("total_price"));
+                order.setOrderDate(rs.getTimestamp("created_at")); // nếu có cột này
+                orders.add(order);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (connect != null) connect.close();
+        }
+        return orders;
+    }
+
+    public List<Order> getOrderByUser(int userId) throws SQLException {
+        List<Order> orders = new ArrayList<>();
+        String sql = "SELECT * FROM orders WHERE user_id = ?";
+        try {
+            connect = DatabaseConnection.getConnection();
+            ps = connect.prepareStatement(sql);
+            ps.setInt(1, userId);
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                Order order = new Order();
+                order.setOrderId(rs.getInt("id"));
+                order.setUserId(rs.getInt("user_id"));
+                order.setEmail(rs.getString("email"));
+                order.setPhoneNumber(rs.getString("phone"));
+                order.setAddress(rs.getString("address"));
+                order.setTotal(rs.getDouble("total_price"));
+                order.setOrderDate(rs.getTimestamp("created_at")); // nếu có cột này
+                orders.add(order);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (connect != null) connect.close();
+        }
+        return orders;
+    }
+    public List<OrderDetail> getOrderDetails(int orderId) throws SQLException {
+        List<OrderDetail> details = new ArrayList<>();
+        String sql = "SELECT od.product_id, p.name AS product_name, od.quantity, od.price " +
+                "FROM order_details od " +
+                "JOIN product p ON od.product_id = p.id " +
+                "WHERE od.order_id = ?";
+        try {
+            connect = DatabaseConnection.getConnection();
+            ps = connect.prepareStatement(sql);
+            ps.setInt(1, orderId);
+            rs = ps.executeQuery();
+
+            while (rs.next()) {
+                OrderDetail detail = new OrderDetail();
+                detail.setProductId(rs.getInt("product_id"));
+                detail.setProductName(rs.getString("product_name"));
+                detail.setQuantity(rs.getInt("quantity"));
+                detail.setPrice(rs.getInt("price"));
+                details.add(detail);
+            }
+        } catch (Exception e) {
+            throw new SQLException("Lỗi truy xuất chi tiết đơn hàng", e);
+        } finally {
+            if (connect != null) connect.close();
+        }
+        return details;
+    }
+
 }

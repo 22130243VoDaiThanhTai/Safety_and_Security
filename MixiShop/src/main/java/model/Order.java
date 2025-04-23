@@ -10,6 +10,8 @@ import java.util.TimeZone;
 public class Order {
     private static int orderCount = 0;
     private int orderId;
+    private int userId;
+    private String email;
     private List<Item> items;
     private String nameUser;
     private String address;
@@ -33,9 +35,41 @@ public class Order {
         this.status = "Pending";
     }
 
+    public Order() {
+
+    }
+
     // Getter và Setter
+
+
+    public static int getOrderCount() {
+        return orderCount;
+    }
+
+    public static void setOrderCount(int orderCount) {
+        Order.orderCount = orderCount;
+    }
+
     public int getOrderId() {
         return orderId;
+    }
+
+    public void setOrderId(int orderId) {
+        this.orderId = orderId;
+    }
+
+    public int getUserId() {
+        return userId;
+    }
+
+    public void setUserId(int userId) {
+        this.userId = userId;
+    }
+    public String getEmail() {
+        return email;
+    }
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public List<Item> getItems() {
