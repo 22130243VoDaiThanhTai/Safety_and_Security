@@ -3,6 +3,7 @@ package controller;
 import model.Account;
 import dao.AccountDAO;
 import org.json.JSONObject;
+import util.Email;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -85,13 +86,32 @@ public class GoogleCallbackController extends HttpServlet {
             newAccount.setEmail(email);
             newAccount.setUsername(name); // Hoặc set username nếu cần
             newAccount.setRole(1); // Role mặc định hoặc theo yêu cầu (0: Admin, 1: User)
+            newAccount.setStatus(0); // Đánh dấu trạng thái là chưa xác minh
 
             // Lưu tài khoản mới vào database
             accountDAO.registerGoogleUser(newAccount);
             existingAccount = newAccount; // Cập nhật tài khoản mới tạo vào session
         }
 
-        // Lưu thông tin vào session
+        // Kiểm tra trạng thái xác minh email
+        if (existingAccount.getStatus() == 0) {
+            String verificationLink = "http://localhost:8080/verify?email=" + URLEncoder.encode(email, "UTF-8");
+            String messageText = "Chào " + name + ",\n\nVui lòng xác minh email của bạn bằng cách nhấp vào liên kết sau:\n" + verificationLink;
+
+            try {
+                Email.sendEmail(email, "Xác minh email của bạn", messageText);
+                System.out.println("Email xác minh đã được gửi đến: " + email);  // Log khi email đã gửi
+            } catch (Exception e) {
+                e.printStackTrace();
+                // Có thể thông báo lỗi gửi email cho người dùng
+            }
+
+            // Chuyển hướng đến trang thông báo yêu cầu xác minh email
+            response.sendRedirect(request.getContextPath() + "/verify-email.jsp");
+            return; // Dừng lại ở đây để không cho phép đăng nhập
+        }
+
+        // Nếu email đã được xác minh (status == 1), tiếp tục đăng nhập
         HttpSession session = request.getSession();
         session.setAttribute("account", existingAccount);
 
