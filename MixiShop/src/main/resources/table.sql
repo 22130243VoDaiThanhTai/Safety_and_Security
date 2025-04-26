@@ -26,3 +26,6 @@ CREATE TABLE account (
                          role INT,
                          phone VARCHAR(15)
 );
+ALTER TABLE account
+    ADD COLUMN status INT DEFAULT 0;
+
