@@ -26,6 +26,9 @@ CREATE TABLE account (
                          role INT,
                          phone VARCHAR(15)
 );
+ALTER TABLE account
+    ADD COLUMN status INT DEFAULT 0;
+
 -- Bảng lưu thông tin đơn hàng
 CREATE TABLE orders (
                         id INT AUTO_INCREMENT PRIMARY KEY,

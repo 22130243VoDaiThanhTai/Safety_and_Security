@@ -1,79 +1,67 @@
 package dao;
 
 import model.Account;
-import model.Product;
 import database.DatabaseConnection;
 import org.mindrot.jbcrypt.BCrypt;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
 public class AccountDAO {
-    Connection connect = null;
-    PreparedStatement ps = null;
-    ResultSet rs = null;
+    private Connection connect;
+    private PreparedStatement ps;
+    private ResultSet rs;
 
     public synchronized Account authenticateUser(String username, String password) {
         try {
-            // Mở kết nối với cơ sở dữ liệu
             connect = DatabaseConnection.getConnection();
-
-            // Truy vấn để lấy tài khoản theo username
             String sql = "SELECT * FROM account WHERE username = ?";
             ps = connect.prepareStatement(sql);
             ps.setString(1, username);
-
-            // Thực hiện truy vấn
             rs = ps.executeQuery();
 
-            // Nếu tìm thấy tài khoản
             if (rs.next()) {
-                int id = rs.getInt("id");
-                String hashedPassword = rs.getString("password"); // Lấy mật khẩu đã mã hóa
-                String email = rs.getString("email");
-                String address = rs.getString("address");
-                int role = rs.getInt("role");
-                String phone = rs.getString("phone");
-
-                // Kiểm tra mật khẩu nhập vào có khớp với mật khẩu đã mã hóa hay không
+                String hashedPassword = rs.getString("password");
                 if (BCrypt.checkpw(password, hashedPassword)) {
-                    return new Account(id, username, hashedPassword, email, address, role, phone);
+                    return new Account(
+                            rs.getInt("id"),
+                            username,
+                            hashedPassword,
+                            rs.getString("email"),
+                            rs.getString("address"),
+                            rs.getInt("role"),
+                            rs.getString("phone"),
+                            rs.getInt("status"),
+                            rs.getInt("phone_verified")
+                    );
                 }
             }
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            // Đóng kết nối
             closeConnections();
         }
-
-        // Trả về null nếu không tìm thấy tài khoản hoặc mật khẩu không đúng
         return null;
     }
 
-
     public boolean registerUser(Account account) {
-        String sql = "INSERT INTO account(username, email, address, password, role, phone) VALUES (?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO account(username, email, address, password, role, phone, status,phone_verified) VALUES (?, ?, ?, ?, ?, ?, ?,?)";
         try {
             connect = DatabaseConnection.getConnection();
             ps = connect.prepareStatement(sql);
 
-
             String hashedPassword = hashPassword(account.getPassword());
-
             ps.setString(1, account.getUsername());
             ps.setString(2, account.getEmail());
             ps.setString(3, account.getAddress());
-            ps.setString(4, hashedPassword); // Lưu mật khẩu đã mã hóa
+            ps.setString(4, hashedPassword);
             ps.setInt(5, account.getRole());
             ps.setString(6, account.getPhone());
-            System.out.println("Mật khẩu lấy từ DB: " + hashedPassword);
-            return ps.executeUpdate() > 0;
+            ps.setInt(7, 0); // Mặc định status = 0 (chưa xác minh)
+            ps.setInt(8, 1); // Mặc định phone_verified = 1 ( đã xác thực)
 
+            return ps.executeUpdate() > 0;
         } catch (Exception e) {
             e.printStackTrace();
             return false;
@@ -81,6 +69,7 @@ public class AccountDAO {
             closeConnections();
         }
     }
+
     public boolean deleteAccount(int id) {
         String sql = "DELETE FROM account WHERE id = ?";
         try {
@@ -96,24 +85,17 @@ public class AccountDAO {
         }
     }
 
-    // Hàm mã hóa mật khẩu bằng BCrypt
     private String hashPassword(String password) {
         return BCrypt.hashpw(password, BCrypt.gensalt());
     }
 
     public boolean validateUser(String username, String password) {
         Account user = findUserByUsername(username);
-        if (user != null) {
-            // So sánh mật khẩu đã mã hóa với mật khẩu người dùng nhập vào
-            return BCrypt.checkpw(password, user.getPassword());
-        }
-        return false;
+        return user != null && BCrypt.checkpw(password, user.getPassword());
     }
 
     private Account findUserByUsername(String username) {
-        Account user = null;
         String sql = "SELECT * FROM account WHERE username = ?";
-
         try {
             connect = DatabaseConnection.getConnection();
             ps = connect.prepareStatement(sql);
@@ -121,22 +103,26 @@ public class AccountDAO {
             rs = ps.executeQuery();
 
             if (rs.next()) {
-                user = new Account();
-                user.setUsername(rs.getString("username"));
-                user.setEmail(rs.getString("email"));
-                user.setAddress(rs.getString("address"));
-                user.setPassword(rs.getString("password")); // Lưu mật khẩu đã mã hóa
-                user.setPhone(rs.getString("phone"));
+                return new Account(
+                        rs.getInt("id"),
+                        username,
+                        rs.getString("password"),
+                        rs.getString("email"),
+                        rs.getString("address"),
+                        rs.getInt("role"),
+                        rs.getString("phone"),
+                        rs.getInt("status"),
+                        rs.getInt("phone_verified")
+                );
             }
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
             closeConnections();
         }
-        return user; // Trả về user hoặc null nếu không tìm thấy
+        return null;
     }
 
-    // Tìm tài khoản theo email
     public Account findUserByEmail(String email) {
         String sql = "SELECT * FROM account WHERE email = ?";
         try {
@@ -144,6 +130,7 @@ public class AccountDAO {
             ps = connect.prepareStatement(sql);
             ps.setString(1, email);
             rs = ps.executeQuery();
+
             if (rs.next()) {
                 return new Account(
                         rs.getInt("id"),
@@ -152,7 +139,9 @@ public class AccountDAO {
                         email,
                         rs.getString("address"),
                         rs.getInt("role"),
-                        rs.getString("phone")
+                        rs.getString("phone"),
+                        rs.getInt("status"),
+                        rs.getInt("phone_verified")
                 );
             }
         } catch (Exception e) {
@@ -160,76 +149,9 @@ public class AccountDAO {
         } finally {
             closeConnections();
         }
-        return null;  // Nếu không tìm thấy tài khoản
-    }
-    private boolean isAccountExist(String email) {
-        String sql = "SELECT COUNT(*) FROM account WHERE email = ?";
-        try (Connection connect = DatabaseConnection.getConnection();
-             PreparedStatement ps = connect.prepareStatement(sql)) {
-            ps.setString(1, email);
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next() && rs.getInt(1) > 0) {
-                    return true; // Tài khoản đã tồn tại
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return false;
+        return null;
     }
 
-    // Đăng ký tài khoản mới khi đăng nhập bằng Google
-    public void registerGoogleUser(Account acc) {
-        String sql = "INSERT INTO account (email, username, role) VALUES (?, ?, ?)";
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-
-            ps.setString(1, acc.getEmail());
-            ps.setString(2, acc.getUsername());
-            ps.setInt(3, acc.getRole());
-
-            ps.executeUpdate();
-
-        } catch (SQLException e) {
-            e.printStackTrace(); // hoặc log ra logger
-        }
-    }
-
-
-
-
-
-
-    public List<Account> getAllAccount() {
-        List<Account> listAccount = new ArrayList<Account>();
-        try {
-
-            connect = DatabaseConnection.getConnection();
-
-            String sql = "select * from account";
-
-            ps = connect.prepareStatement(sql);
-
-            rs = ps.executeQuery();
-
-            while (rs.next()) {
-                int id = rs.getInt(1);
-                String username = rs.getString(2);
-                String password = rs.getString(3);
-                String email = rs.getString(4);
-                String address = rs.getString(5);
-                int role = rs.getInt(6);
-                String phone = rs.getString(7);
-
-                Account account = new Account(id, username, password, email, address, role, phone);
-
-                listAccount.add(account);
-            }
-        } catch (Exception e) {
-            // TODO: handle exception
-        }
-        return listAccount;
-    }
     public boolean checkPhoneExists(String phone) {
         if (!phone.matches("^0\\d{9}$")) {
             return false;
@@ -240,12 +162,12 @@ public class AccountDAO {
             ps = connect.prepareStatement(sql);
             ps.setString(1, phone);
             rs = ps.executeQuery();
-            return rs.next() && rs.getInt(1) > 0; // Trả về true nếu tồn tại
+            return rs.next() && rs.getInt(1) > 0;
         } catch (SQLException e) {
             e.printStackTrace();
             return false;
         } finally {
-            closeConnections(); // Luôn đóng kết nối
+            closeConnections();
         }
     }
 
@@ -256,14 +178,75 @@ public class AccountDAO {
             ps = connect.prepareStatement(sql);
             ps.setString(1, email);
             rs = ps.executeQuery();
-            return rs.next() && rs.getInt(1) > 0; // Trả về true nếu tồn tại
+            return rs.next() && rs.getInt(1) > 0;
         } catch (SQLException e) {
             e.printStackTrace();
             return false;
         } finally {
-            closeConnections(); // Luôn đóng kết nối
+            closeConnections();
         }
     }
+
+    public boolean isAccountExist(String email) {
+        String sql = "SELECT COUNT(*) FROM account WHERE email = ?";
+        try (Connection connect = DatabaseConnection.getConnection();
+             PreparedStatement ps = connect.prepareStatement(sql)) {
+            ps.setString(1, email);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next() && rs.getInt(1) > 0;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public void registerGoogleUser(Account acc) {
+        String sql = "INSERT INTO account (email, username, role, status,phone_verified) VALUES (?, ?, ?, ?,?)";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, acc.getEmail());
+            ps.setString(2, acc.getUsername());
+            ps.setInt(3, acc.getRole());
+            ps.setInt(4, 0); // status mặc định là 0
+            ps.setInt(5, 1); //   phone_verified mặc định = 1 ( đã xác thực)
+            ps.executeUpdate();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public List<Account> getAllAccount() {
+        List<Account> listAccount = new ArrayList<>();
+        String sql = "SELECT * FROM account";
+        try {
+            connect = DatabaseConnection.getConnection();
+            ps = connect.prepareStatement(sql);
+            rs = ps.executeQuery();
+
+            while (rs.next()) {
+                listAccount.add(new Account(
+                        rs.getInt("id"),
+                        rs.getString("username"),
+                        rs.getString("password"),
+                        rs.getString("email"),
+                        rs.getString("address"),
+                        rs.getInt("role"),
+                        rs.getString("phone"),
+                        rs.getInt("status"),
+                        rs.getInt("phone_verified")
+                ));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            closeConnections();
+        }
+        return listAccount;
+    }
+
     public void updateUserRole(int userId, int roleId) {
         String sql = "UPDATE account SET role = ? WHERE id = ?";
         try {
@@ -274,10 +257,52 @@ public class AccountDAO {
             ps.executeUpdate();
         } catch (Exception e) {
             e.printStackTrace();
+        } finally {
+            closeConnections();
         }
     }
 
+    public void updateStatusByEmail(String email) {
+        String sql = "UPDATE account SET status = 1 WHERE email = ?";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, email);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
 
+    }
+//    public boolean isPhoneVerified(String phone) {
+//        String sql = "SELECT phone_verified FROM account WHERE phone = ?";
+//        try {
+//            connect = DatabaseConnection.getConnection();
+//            ps = connect.prepareStatement(sql);
+//            ps.setString(1, phone);
+//            rs = ps.executeQuery();
+//            return rs.next() && rs.getInt("phone_verified") == 1;
+//        } catch (SQLException e) {
+//            e.printStackTrace();
+//            return false;
+//        } finally {
+//            closeConnections();
+//        }
+//    }
+//    public boolean updatePhoneVerification(String phone, int status) {
+//        String sql = "UPDATE account SET phone_verified = ? WHERE phone = ?";
+//        try {
+//            connect = DatabaseConnection.getConnection();
+//            ps = connect.prepareStatement(sql);
+//            ps.setInt(1, status);
+//            ps.setString(2, phone);
+//            return ps.executeUpdate() > 0;
+//        } catch (SQLException e) {
+//            e.printStackTrace();
+//            return false;
+//        } finally {
+//            closeConnections();
+//        }
+//    }
 
     private void closeConnections() {
         try {
@@ -289,6 +314,3 @@ public class AccountDAO {
         }
     }
 }
-
-
-
