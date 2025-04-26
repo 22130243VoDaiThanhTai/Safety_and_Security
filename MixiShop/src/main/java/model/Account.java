@@ -9,9 +9,10 @@ public class Account {
 	private int role;
 	private String phone;
 	private int status;
+	private int phoneVerified;
 
 	// Constructor đầy đủ
-	public Account(int id, String username, String password, String email, String address, int role, String phone, int status) {
+	public Account(int id, String username, String password, String email, String address, int role, String phone, int status, int phoneVerified) {
 		this.id = id;
 		this.username = username;
 		this.password = password;
@@ -20,6 +21,7 @@ public class Account {
 		this.role = role;
 		this.phone = phone;
 		this.status = status;
+		this.phoneVerified = phoneVerified;
 	}
 
 	// Constructor không có id và role và status (dùng khi đăng ký)
@@ -30,6 +32,7 @@ public class Account {
 		this.address = address;
 		this.phone = phone;
 		this.status = 0; // Mặc định là chưa xác minh
+		this.phoneVerified = 0;// Mặc định là chưa xác minh
 	}
 
 	public Account() {}
@@ -98,5 +101,13 @@ public class Account {
 
 	public void setStatus(int status) {
 		this.status = status;
+	}
+
+	public int getPhoneVerified() {
+		return phoneVerified;
+	}
+
+	public void setPhoneVerified(int phoneVerified) {
+		this.phoneVerified = phoneVerified;
 	}
 }
