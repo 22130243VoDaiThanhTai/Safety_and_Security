@@ -10,6 +10,8 @@ import java.util.TimeZone;
 public class Order {
     private static int orderCount = 0;
     private int orderId;
+    private int userId;
+    private String email;
     private List<Item> items;
     private String nameUser;
     private String address;
@@ -19,6 +21,18 @@ public class Order {
     private double total;
     private String status;
     private boolean isConfirmed;
+
+    public Order(int orderId, int userId, String email, List<Item> items, String address, String phoneNumber, Date orderDate, double total, String status) {
+        this.orderId = orderId;
+        this.userId = userId;
+        this.email = email;
+        this.items = items;
+        this.address = address;
+        this.phoneNumber = phoneNumber;
+        this.orderDate = orderDate;
+        this.total = total;
+        this.status = "Pending";
+    }
 
     // Constructor
     public Order(Cart cart, String nameUser, String address, String phoneNumber) {
@@ -33,9 +47,41 @@ public class Order {
         this.status = "Pending";
     }
 
+    public Order() {
+
+    }
+
     // Getter và Setter
+
+
+    public static int getOrderCount() {
+        return orderCount;
+    }
+
+    public static void setOrderCount(int orderCount) {
+        Order.orderCount = orderCount;
+    }
+
     public int getOrderId() {
         return orderId;
+    }
+
+    public void setOrderId(int orderId) {
+        this.orderId = orderId;
+    }
+
+    public int getUserId() {
+        return userId;
+    }
+
+    public void setUserId(int userId) {
+        this.userId = userId;
+    }
+    public String getEmail() {
+        return email;
+    }
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public List<Item> getItems() {
