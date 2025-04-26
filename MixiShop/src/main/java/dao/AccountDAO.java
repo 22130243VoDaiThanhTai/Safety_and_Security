@@ -202,7 +202,7 @@ public class AccountDAO {
     }
 
     public void registerGoogleUser(Account acc) {
-        String sql = "INSERT INTO account (email, username, role, status) VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO account (email, username, role, status,phone_verified) VALUES (?, ?, ?, ?)";
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
@@ -210,6 +210,7 @@ public class AccountDAO {
             ps.setString(2, acc.getUsername());
             ps.setInt(3, acc.getRole());
             ps.setInt(4, 0); // status mặc định là 0
+            ps.setInt(5, 0); // phone_verified là 0
             ps.executeUpdate();
 
         } catch (SQLException e) {
