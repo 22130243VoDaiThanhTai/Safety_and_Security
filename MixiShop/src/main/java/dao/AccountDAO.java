@@ -32,7 +32,8 @@ public class AccountDAO {
                             rs.getString("address"),
                             rs.getInt("role"),
                             rs.getString("phone"),
-                            rs.getInt("status")
+                            rs.getInt("status"),
+                            rs.getInt("phone_verìied")
                     );
                 }
             }
@@ -45,7 +46,7 @@ public class AccountDAO {
     }
 
     public boolean registerUser(Account account) {
-        String sql = "INSERT INTO account(username, email, address, password, role, phone, status) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO account(username, email, address, password, role, phone, status,phoneVerified) VALUES (?, ?, ?, ?, ?, ?, ?,?)";
         try {
             connect = DatabaseConnection.getConnection();
             ps = connect.prepareStatement(sql);
@@ -58,6 +59,7 @@ public class AccountDAO {
             ps.setInt(5, account.getRole());
             ps.setString(6, account.getPhone());
             ps.setInt(7, 0); // Mặc định status = 0 (chưa xác minh)
+            ps.setInt(8, 0); // Mặc định phoneVerified = 0 (chưa xác minh)
 
             return ps.executeUpdate() > 0;
         } catch (Exception e) {
@@ -109,7 +111,8 @@ public class AccountDAO {
                         rs.getString("address"),
                         rs.getInt("role"),
                         rs.getString("phone"),
-                        rs.getInt("status")
+                        rs.getInt("status"),
+                        rs.getInt("phone_verified")
                 );
             }
         } catch (Exception e) {
@@ -137,7 +140,8 @@ public class AccountDAO {
                         rs.getString("address"),
                         rs.getInt("role"),
                         rs.getString("phone"),
-                        rs.getInt("status")
+                        rs.getInt("status"),
+                        rs.getInt("phone_verified")
                 );
             }
         } catch (Exception e) {
@@ -230,7 +234,8 @@ public class AccountDAO {
                         rs.getString("address"),
                         rs.getInt("role"),
                         rs.getString("phone"),
-                        rs.getInt("status")
+                        rs.getInt("status"),
+                        rs.getInt("phone_verified")
                 ));
             }
         } catch (Exception e) {
