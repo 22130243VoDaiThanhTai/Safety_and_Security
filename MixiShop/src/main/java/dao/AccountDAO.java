@@ -270,6 +270,37 @@ public class AccountDAO {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+
+    }
+    public boolean isPhoneVerified(String phone) {
+        String sql = "SELECT phone_verified FROM account WHERE phone = ?";
+        try {
+            connect = DatabaseConnection.getConnection();
+            ps = connect.prepareStatement(sql);
+            ps.setString(1, phone);
+            rs = ps.executeQuery();
+            return rs.next() && rs.getInt("phone_verified") == 1;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        } finally {
+            closeConnections();
+        }
+    }
+    public boolean updatePhoneVerification(String phone, int status) {
+        String sql = "UPDATE account SET phone_verified = ? WHERE phone = ?";
+        try {
+            connect = DatabaseConnection.getConnection();
+            ps = connect.prepareStatement(sql);
+            ps.setInt(1, status);
+            ps.setString(2, phone);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        } finally {
+            closeConnections();
+        }
     }
 
     private void closeConnections() {
