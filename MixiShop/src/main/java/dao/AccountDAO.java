@@ -32,8 +32,7 @@ public class AccountDAO {
                             rs.getString("address"),
                             rs.getInt("role"),
                             rs.getString("phone"),
-                            rs.getInt("status"),
-                            rs.getInt("phone_verified")
+                            rs.getInt("status")
                     );
                 }
             }
@@ -46,7 +45,7 @@ public class AccountDAO {
     }
 
     public boolean registerUser(Account account) {
-        String sql = "INSERT INTO account(username, email, address, password, role, phone, status,phone_verified) VALUES (?, ?, ?, ?, ?, ?, ?,?)";
+        String sql = "INSERT INTO account(username, email, address, password, role, phone, status) VALUES ( ?, ?, ?, ?, ?, ?,?)";
         try {
             connect = DatabaseConnection.getConnection();
             ps = connect.prepareStatement(sql);
@@ -56,11 +55,9 @@ public class AccountDAO {
             ps.setString(2, account.getEmail());
             ps.setString(3, account.getAddress());
             ps.setString(4, hashedPassword);
-            ps.setInt(5, account.getRole());
+            ps.setInt(5, 1); // Mặc định 1 user thường
             ps.setString(6, account.getPhone());
             ps.setInt(7, 0); // Mặc định status = 0 (chưa xác minh)
-            ps.setInt(8, 1); // Mặc định phone_verified = 1 ( đã xác thực)
-
             return ps.executeUpdate() > 0;
         } catch (Exception e) {
             e.printStackTrace();
@@ -68,6 +65,19 @@ public class AccountDAO {
         } finally {
             closeConnections();
         }
+    }
+    // Cập nhật trạng thái theo số điện thoại
+    public boolean updateStatus(String phone, int status) {
+        String sql = "UPDATE account SET status = ? WHERE phone = ?";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, status);
+            ps.setString(2, phone);
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 
     public boolean deleteAccount(int id) {
@@ -111,8 +121,7 @@ public class AccountDAO {
                         rs.getString("address"),
                         rs.getInt("role"),
                         rs.getString("phone"),
-                        rs.getInt("status"),
-                        rs.getInt("phone_verified")
+                        rs.getInt("status")
                 );
             }
         } catch (Exception e) {
@@ -136,13 +145,13 @@ public class AccountDAO {
                         rs.getInt("id"),
                         rs.getString("username"),
                         rs.getString("password"),
-                        email,
+                        rs.getString("email"),
                         rs.getString("address"),
                         rs.getInt("role"),
                         rs.getString("phone"),
-                        rs.getInt("status"),
-                        rs.getInt("phone_verified")
+                        rs.getInt("status")
                 );
+
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -202,7 +211,7 @@ public class AccountDAO {
     }
 
     public void registerGoogleUser(Account acc) {
-        String sql = "INSERT INTO account (email, username, role, status,phone_verified) VALUES (?, ?, ?, ?,?)";
+        String sql = "INSERT INTO account (email, username, role, status) VALUES (?, ?, ?, ?)";
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
@@ -210,7 +219,6 @@ public class AccountDAO {
             ps.setString(2, acc.getUsername());
             ps.setInt(3, acc.getRole());
             ps.setInt(4, 0); // status mặc định là 0
-            ps.setInt(5, 1); //   phone_verified mặc định = 1 ( đã xác thực)
             ps.executeUpdate();
 
         } catch (SQLException e) {
@@ -235,8 +243,7 @@ public class AccountDAO {
                         rs.getString("address"),
                         rs.getInt("role"),
                         rs.getString("phone"),
-                        rs.getInt("status"),
-                        rs.getInt("phone_verified")
+                        rs.getInt("status")
                 ));
             }
         } catch (Exception e) {
@@ -273,36 +280,6 @@ public class AccountDAO {
         }
 
     }
-//    public boolean isPhoneVerified(String phone) {
-//        String sql = "SELECT phone_verified FROM account WHERE phone = ?";
-//        try {
-//            connect = DatabaseConnection.getConnection();
-//            ps = connect.prepareStatement(sql);
-//            ps.setString(1, phone);
-//            rs = ps.executeQuery();
-//            return rs.next() && rs.getInt("phone_verified") == 1;
-//        } catch (SQLException e) {
-//            e.printStackTrace();
-//            return false;
-//        } finally {
-//            closeConnections();
-//        }
-//    }
-//    public boolean updatePhoneVerification(String phone, int status) {
-//        String sql = "UPDATE account SET phone_verified = ? WHERE phone = ?";
-//        try {
-//            connect = DatabaseConnection.getConnection();
-//            ps = connect.prepareStatement(sql);
-//            ps.setInt(1, status);
-//            ps.setString(2, phone);
-//            return ps.executeUpdate() > 0;
-//        } catch (SQLException e) {
-//            e.printStackTrace();
-//            return false;
-//        } finally {
-//            closeConnections();
-//        }
-//    }
 
     private void closeConnections() {
         try {
