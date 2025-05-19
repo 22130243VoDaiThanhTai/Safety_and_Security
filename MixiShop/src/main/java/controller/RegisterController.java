@@ -11,10 +11,16 @@ import javax.servlet.http.HttpServletResponse;
 
 import dao.AccountDAO;
 import model.Account;
+import service.OTPService;
 
 @WebServlet("/register")
 public class RegisterController extends HttpServlet {
     private AccountDAO accountDAO = new AccountDAO();
+
+    @Override
+    public void init() throws ServletException {
+        accountDAO = new AccountDAO();
+    }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -27,66 +33,48 @@ public class RegisterController extends HttpServlet {
     }
 
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        response.setContentType("text/html; charset=UTF-8");
-        response.setCharacterEncoding("UTF-8");
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+
         String username = request.getParameter("username");
+        String password = request.getParameter("password");
         String email = request.getParameter("email");
         String address = request.getParameter("address");
-        String password = request.getParameter("password");
-        String confirmPassword = request.getParameter("confirm-password");
         String phone = request.getParameter("phone");
 
-        // Lấy giá trị role và xử lý null
-        String roleParam = request.getParameter("user-id");
-        int role = (roleParam != null && !roleParam.isEmpty()) ? Integer.parseInt(roleParam) : 1;
 
-        if (!password.equals(confirmPassword)) {
-            request.setAttribute("errorMessage", "Mật khẩu không khớp!");
-            doGet(request, response);
-            return;
-        }
-        if (accountDAO.checkEmailExists(email)) {
-            request.setAttribute("errorMessage", "Email đã tồn tại");
-            doGet(request, response);
+        // Kiểm tra dữ liệu đầu vào (bạn có thể thêm validate sâu hơn nếu cần)
+        if (accountDAO.checkEmailExists(email) || accountDAO.checkPhoneExists(phone)) {
+            request.setAttribute("error", "Email hoặc số điện thoại đã tồn tại.");
+            request.setAttribute("contentPage", "register.jsp");
+            RequestDispatcher dispatcher = request.getRequestDispatcher("base.jsp");
+            dispatcher.forward(request, response);
             return;
         }
 
-        if (accountDAO.checkPhoneExists(phone)) {
-            request.setAttribute("errorMessage", "Số điện thoại đã được sử dụng");
-            doGet(request, response);
+        // Tạo đối tượng Account với status = 0
+        Account newAccount = new Account(username, password, email, address, phone);
+        boolean inserted = accountDAO.registerUser(newAccount);
+
+        if (!inserted) {
+            request.setAttribute("error", "Đăng ký thất bại. Vui lòng thử lại.");
+            request.setAttribute("contentPage", "register.jsp");
+            RequestDispatcher dispatcher = request.getRequestDispatcher("base.jsp");
+            dispatcher.forward(request, response);
             return;
         }
-        if (!isValidPhoneNumber(phone)) {
-            request.setAttribute("errorMessage", "Số điện thoại không hợp lệ");
-            doGet(request, response);
-            return;
-        }
 
-        // Tạo đối tượng Account mới và thiết lập giá trị cho các thuộc tính
-        Account account = new Account();
-        account.setUsername(username);
-        account.setEmail(email);
-        account.setAddress(address);
-        account.setPassword(password);
-        account.setRole(role);
-        account.setPhone(phone);
+        // Tạo và gửi OTP
+        String otp = OTPService.generateOTP(phone);
+        OTPService.sendOTP(phone, otp);
 
-        // Gọi phương thức registerUser từ AccountDAO để lưu thông tin người dùng
-        boolean isRegistered = accountDAO.registerUser(account);
-
-        if (isRegistered) {
-            response.sendRedirect("login");
-        } else {
-            request.setAttribute("errorMessage", "Đăng ký thất bại. Vui lòng thử lại!");
-            doGet(request, response);
-        }
+        // Lưu số điện thoại để xác thực OTP sau
+        request.setAttribute("phone", phone);
+        request.setAttribute("contentPage", "verify-otp.jsp");
+        RequestDispatcher dispatcher = request.getRequestDispatcher("base.jsp");
+        dispatcher.forward(request, response);
     }
-    private boolean isValidPhoneNumber(String phone) {
-        if (phone == null) return false;
-        return phone.matches("^(0)(\\d{9,10})$");
-    }
-    }
+}
 
 
 

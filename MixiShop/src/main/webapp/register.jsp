@@ -15,39 +15,6 @@
 									<div class="alert alert-danger">${errorMessage}</div>
 								</c:if>
 
-								<c:choose>
-									<c:when test="${otpStep eq 'verify'}">
-										<!-- OTP Verification Step -->
-										<p class="text-center h2 fw-bold mb-5 mx-1 mx-md-4 mt-4">Xác thực OTP</p>
-										<p class="text-center mb-4">Mã OTP đã được gửi đến số ${phone}</p>
-
-										<form class="mx-1 mx-md-4" method="POST" action="register">
-											<input type="hidden" name="action" value="verifyOTP">
-											<input type="hidden" name="phone" value="${phone}">
-
-											<div class="d-flex flex-row align-items-center mb-4">
-												<i class="fas fa-shield-alt fa-lg me-3 fa-fw"></i>
-												<div data-mdb-input-init class="form-outline flex-fill mb-0">
-													<label class="form-label">Mã OTP:</label>
-													<input type="text" name="otp" class="form-control" required maxlength="6">
-													<small class="text-muted">Nhập mã 6 số bạn nhận được qua SMS</small>
-												</div>
-											</div>
-
-											<div class="d-flex justify-content-center mx-4 mb-3 mb-lg-4">
-												<button type="submit" data-mdb-button-init
-														data-mdb-ripple-init class="btn btn-success btn-radius btn-scale" style="padding: 8px 50px">
-													<strong>Xác thực</strong>
-												</button>
-											</div>
-										</form>
-
-										<div class="text-center">
-											Không nhận được mã? <a href="#" onclick="resendOTP('${phone}')">Gửi lại mã</a>
-										</div>
-									</c:when>
-
-									<c:otherwise>
 										<!-- Registration Form -->
 										<p class="text-center h2 fw-bold mb-5 mx-1 mx-md-4 mt-4">Đăng ký tài khoản</p>
 										<p class="text-center fw-bold mb-5 mx-1 mx-md-4 mt-4">
@@ -91,9 +58,6 @@
 													<div class="input-group">
 														<input type="text" class="form-control" name="phone" id="phone" required
 															   onblur="checkPhoneExists(this.value)"/>
-														<button type="button" id="sendOTPBtn" class="btn btn-outline-secondary">
-															Gửi OTP
-														</button>
 													</div>
 													<span id="phoneError" class="text-danger small"></span>
 													<c:if test="${not empty phoneError}">
@@ -132,8 +96,6 @@
 											</div>
 											<input type="hidden" name="user-id" value="1">
 										</form>
-									</c:otherwise>
-								</c:choose>
 
 								<script>
 									const contextPath = "${pageContext.request.contextPath}";
