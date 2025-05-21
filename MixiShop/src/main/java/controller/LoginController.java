@@ -88,11 +88,34 @@ public class LoginController extends HttpServlet {
 
 		Account account = accountDAO.authenticateUser(username, password);
 		if (account != null) {
-			session.setAttribute("account", account);
-			session.removeAttribute("failedAttempts");
-			session.removeAttribute("lockTime");
-			response.sendRedirect("home");
-		} else {
+			int status = account.getStatus();
+			if (account.getStatus() == 0) {
+				session.setAttribute("unverifiedUser", account); // Lưu user chưa kích hoạt
+				request.setAttribute("mess", "Tài khoản của bạn chưa được kích hoạt.");
+				request.setAttribute("showActivationLink", true); // Hiển thị nút "Kích hoạt ngay"
+				request.setAttribute("contentPage", "login.jsp");
+				RequestDispatcher dispatcher = request.getRequestDispatcher("base.jsp");
+				dispatcher.forward(request, response);
+				return;
+			}
+
+			if (account.getStatus() == 1) {
+				// Đăng nhập thành công
+				session.setAttribute("account", account);
+				response.sendRedirect("home");
+				return;
+			}
+
+			if (account.getStatus() == -1) {
+				request.setAttribute("mess", "Tài khoản đã bị khóa.");
+			} else {
+				request.setAttribute("mess", "Tài khoản không hợp lệ.");
+			}
+
+			request.setAttribute("contentPage", "login.jsp");
+			request.getRequestDispatcher("base.jsp").forward(request, response);
+		}
+		else {
 			if (failedAttempts == null) {
 				failedAttempts = 1;
 			} else {
