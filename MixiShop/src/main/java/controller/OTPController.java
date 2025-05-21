@@ -1,6 +1,7 @@
 package controller;
 
 import dao.AccountDAO;
+import model.Account;
 import service.OTPService;
 
 import javax.servlet.RequestDispatcher;
@@ -17,7 +18,29 @@ public class OTPController extends HttpServlet {
     public void init() throws ServletException {
         accountDAO = new AccountDAO();
     }
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        HttpSession session = request.getSession();
+        Account unverifiedUser = (Account) session.getAttribute("unverifiedUser");
 
+        if (unverifiedUser != null) {
+            String phone = unverifiedUser.getPhone();
+
+            // Gửi OTP mới
+            String otp = OTPService.generateOTP(phone);
+            OTPService.sendOTP(phone, otp);
+
+            // Chuyển sang trang verify nhập OTP
+            request.setAttribute("phone", phone);
+            request.setAttribute("contentPage", "verify-otp.jsp");
+            RequestDispatcher dispatcher = request.getRequestDispatcher("base.jsp");
+            dispatcher.forward(request, response);
+        } else {
+            // Nếu không có user chưa kích hoạt trong session thì quay lại login
+            response.sendRedirect("login");
+        }
+    }
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -29,14 +52,16 @@ public class OTPController extends HttpServlet {
             OTPService.clearOTP(phone); // Xóa OTP sau khi xác minh thành công
             accountDAO.updateStatus(phone, 1); // Cập nhật status = 1 (đã xác thực)
 
-            // Chuyển hướng đến trang đăng nhập hoặc trang chào mừng
+            // Chuyển hướng đến trang đăng nhập
             request.setAttribute("contentPage", "login.jsp");
             RequestDispatcher dispatcher = request.getRequestDispatcher("base.jsp");
             dispatcher.forward(request, response);
         } else {
             request.setAttribute("error", "Mã OTP không đúng hoặc đã hết hạn.");
             request.setAttribute("phone", phone); // Giữ lại để nhập lại OTP
-            request.getRequestDispatcher("verify-otp.jsp").forward(request, response);
+            request.setAttribute("contentPage", "verify-otp.jsp");
+            RequestDispatcher dispatcher = request.getRequestDispatcher("base.jsp");
+            dispatcher.forward(request, response);
         }
     }
 }

@@ -17,7 +17,11 @@
 
 								<!-- Hiển thị thông báo lỗi nếu có -->
 								<p class="text-danger" style="text-align: center; font-weight: 800"> ${mess} </p>
-
+								<c:if test="${showActivationLink}">
+									<p class="text-center">
+										<a href="verify-otp" class="btn btn-link">Kích hoạt ngay</a>
+									</p>
+								</c:if>
 								<form class="mx-1 mx-md-4" method="POST" action="login">
 								
 									<div class="d-flex flex-row align-items-center mb-4">
