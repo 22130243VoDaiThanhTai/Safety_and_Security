@@ -22,6 +22,8 @@ public class Account {
 		this.status = status;
 	}
 
+
+
 	// Constructor không có id và role và status (dùng khi đăng ký)
 	public Account(String username, String password, String email, String address, String phone) {
 		this.username = username;
