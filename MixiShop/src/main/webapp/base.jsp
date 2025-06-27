@@ -8,7 +8,7 @@
 	<meta charset="UTF-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<link href="<c:url value='/images/favicon.ico.jpg'/>" rel="icon" type="image/x-icon">
-	
+
 	<!-- CSS -->
 	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
 	<link href="<c:url value='/css/style.css'/>" rel="stylesheet">
@@ -19,7 +19,7 @@
 	<link href="<c:url value='/css/component/card.css'/>" rel="stylesheet">
 	<link href="<c:url value='/css/component/button.css'/>" rel="stylesheet">
 	<link href="<c:url value='/css/component/animations.css'/>" rel="stylesheet">
-	
+
 	<!-- JS -->
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" crossorigin="anonymous"></script>
 	<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" crossorigin="anonymous"></script>
@@ -28,12 +28,12 @@
 	<script src="<c:url value='/js/notification.js'/>"></script>
 	<script src="<c:url value='/js/owl.carousel.min.js'/>"></script>
 	<script src="<c:url value='/js/all.min.js'/>"></script>
-	
+
 	<title>MixiShop</title>
 	<link rel="stylesheet"
 		href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
 		crossorigin="anonymous" />
-	
+
 	<meta name="description" content="">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
@@ -106,6 +106,7 @@
 									<li><a class="dropdown-item" href="orders"><i class="fa-solid fa-truck-fast"></i> Đơn hàng</a></li>
 									<li><a class="dropdown-item" href="logout"><i class="fa-solid fa-right-from-bracket"></i> Đăng xuất</a></li>
 								</ul></li>
+							<a href="generateKey">tool</a>
 							<!-- Kiểm tra role của người dùng và hiển thị trang ADMIN nếu role = 0 -->
 							<c:if test="${sessionScope.account.role == 0}">
 								<li class="nav-item"><a class="nav-link" href="admin">Trang
@@ -260,24 +261,24 @@
 		</div>
 		<br>
 	</footer>
-	
+
 	<c:if test="${not empty sessionScope.account}">
 	    <script>
 	        var minute = 10;
 	        var second = 60;
 	        var timerOut = minute * second * 1000;
-	
+
 	        // Đặt thời gian hết hạn
 	        let logoutTimer = setTimeout(
 	            function() {
 	                alert("Phiên đăng nhập của bạn đã hết hạn! Vui lòng đăng nhập lại!");
 	                window.location.href = "logout"; // Chuyển hướng đến trang logout
 	            }, timerOut);
-	
+
 	        // Đặt lại timer nếu có hoạt động (di chuyển chuột hoặc nhấn phím)
 	        document.onmousemove = resetTimer;
 	        document.onkeypress = resetTimer;
-	
+
 	        function resetTimer() {
 	            clearTimeout(logoutTimer);
 	            logoutTimer = setTimeout(
