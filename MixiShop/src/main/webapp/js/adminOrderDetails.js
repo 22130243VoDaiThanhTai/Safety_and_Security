@@ -10,7 +10,7 @@ document.addEventListener("DOMContentLoaded", function () {
             }else{
                 console.log("có"+ orderId)
             }
-            fetch(`${window.location.origin}/MixiShop_war/getOrderDetail?orderId=${orderId}`)
+            fetch(`${window.location.origin}/MixiShop/getOrderDetail?orderId=${orderId}`)
                 .then(response => {
                     console.log('Response:', response);  // Log để kiểm tra phản hồi
                     if (!response.ok) {
@@ -42,7 +42,7 @@ document.addEventListener("DOMContentLoaded", function () {
                                 <td>${item.productName}</td>
                                 <td style="display: flex;
                                     justify-content: center;">
-                                    <img src="/MixiShop_war/images/${item.image}" alt="Ảnh sản phẩm" width="60" height="60" style="object-fit: cover;">
+                                    <img src="/MixiShop/images/${item.image}" alt="Ảnh sản phẩm" width="60" height="60" style="object-fit: cover;">
                                     </td>
                                 <td>${item.quantity}</td>
                                 <td>${item.price}</td>

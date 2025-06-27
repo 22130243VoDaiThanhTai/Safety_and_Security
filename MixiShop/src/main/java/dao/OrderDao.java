@@ -1,24 +1,28 @@
 package dao;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import database.DatabaseConnection;
-import model.Item;
-import model.Order;
-import model.OrderDetail;
-import model.Product;
+import model.*;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class OrderDao {
     Connection connect = null;
     PreparedStatement ps = null;
     ResultSet rs = null;
     private ProductDAO productDAO = new ProductDAO();
+    DS ds = new DS();
     public int createOrder(int userId, String email, String phone, String address, double totalPrice) throws SQLException {
         int orderId = -1;
+
         String sql = "INSERT INTO orders (user_id, email, phone, address, total_price) VALUES (?, ?, ?, ?, ?)";
         try {
+
             connect = DatabaseConnection.getConnection();
             ps = connect.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
             ps.setInt(1, userId);
@@ -26,6 +30,34 @@ public class OrderDao {
             ps.setString(3, phone);
             ps.setString(4, address);
             ps.setDouble(5, totalPrice);
+
+            ps.executeUpdate();
+
+            rs = ps.getGeneratedKeys();
+            if (rs.next()) {
+                orderId = rs.getInt(1); // Lấy order_id được tạo ra
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (connect != null) connect.close();
+        }
+        return orderId;
+    }
+    public int createOrder1(int userId, String email, String phone, String address, double totalPrice,String data,String privateKeyBase64) throws SQLException {
+        int orderId = -1;
+
+        String sql = "INSERT INTO orders (user_id, email, phone, address, total_price,signature) VALUES (?, ?, ?, ?, ?,?)";
+        try {
+            String sign = ds.sign(data,privateKeyBase64);
+            connect = DatabaseConnection.getConnection();
+            ps = connect.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+            ps.setInt(1, userId);
+            ps.setString(2, email);
+            ps.setString(3, phone);
+            ps.setString(4, address);
+            ps.setDouble(5, totalPrice);
+            ps.setString(6, sign);
             ps.executeUpdate();
 
             rs = ps.getGeneratedKeys();
@@ -171,5 +203,58 @@ public class OrderDao {
         }
         return details;
     }
+
+//    xacs mionh chữ kí
+    public static String getAllOrderSignatureJson() throws SQLException {
+        List<OrderSignatureDTO> orderJsonList = new ArrayList<>();
+        Connection conn = DatabaseConnection.getConnection();
+
+        String sql = "SELECT o.id AS order_id, o.total_price, o.address, o.phone, o.user_id, a.username " +
+                "FROM orders o JOIN account a ON o.user_id = a.id";
+        PreparedStatement ps = conn.prepareStatement(sql);
+        ResultSet rs = ps.executeQuery();
+
+        while (rs.next()) {
+            int orderId = rs.getInt("order_id");
+            double total = rs.getDouble("total_price");
+            String address = rs.getString("address");
+            String phone = rs.getString("phone");
+            int userId = rs.getInt("user_id");
+            String username = rs.getString("username");
+
+            // Lấy danh sách sản phẩm cho đơn này
+            List<OrderItemDTO> items = new ArrayList<>();
+            String detailSql = "SELECT p.id AS product_id, p.name AS product_name, od.quantity, od.price " +
+                    "FROM order_details od JOIN product p ON od.product_id = p.id WHERE od.order_id = ?";
+            PreparedStatement psDetail = conn.prepareStatement(detailSql);
+            psDetail.setInt(1, orderId);
+            ResultSet rsDetail = psDetail.executeQuery();
+
+            while (rsDetail.next()) {
+                items.add(new OrderItemDTO(
+                        rsDetail.getInt("product_id"),
+                        rsDetail.getString("product_name"),
+                        rsDetail.getInt("quantity"),
+                        rsDetail.getDouble("price")
+                ));
+            }
+
+            OrderSignatureDTO orderDTO = new OrderSignatureDTO(items, total, address, phone, userId, username);
+            orderJsonList.add(orderDTO);
+            System.out.println(orderJsonList.size());
+        }
+
+        conn.close();
+
+        // Convert list sang JSON
+        Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
+        return gson.toJson(orderJsonList);
+    }
+
+
+    public static void main(String[] args) throws SQLException {
+        System.out.println(getAllOrderSignatureJson());
+    }
+
 
 }

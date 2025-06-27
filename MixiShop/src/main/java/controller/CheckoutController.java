@@ -65,6 +65,16 @@ public class CheckoutController extends HttpServlet {
         HttpSession session = request.getSession();
         Cart cart = (Cart) session.getAttribute("cart");
         Account account = (Account) request.getSession().getAttribute("account");
+        // Hàm để build JSON order
+        String orderJson = cart.cartToJson(cart, account, address, phone);
+
+// In ra chuỗi JSON đơn hàng
+        System.out.println("✅ Chuỗi JSON đơn hàng để ký:");
+        System.out.println(orderJson);
+        String privateKeyBase64 = request.getParameter("privateKey");
+        System.out.println(privateKeyBase64 + " privatekey nè");
+
+
         int userId = account.getId();
         // tạo đơn hàng
         String[] productIds = request.getParameterValues("productId");
@@ -73,7 +83,7 @@ public class CheckoutController extends HttpServlet {
         double totalPrice = cart.getTotal();
         OrderDao orderDao = new OrderDao();
         try {
-            int orderId = orderDao.createOrder(userId,email,phone,address,totalPrice);
+            int orderId = orderDao.createOrder1(userId,email,phone,address,totalPrice,orderJson,privateKeyBase64);
             for (int i = 0; i < productIds.length; i++) {
                 int productId = Integer.parseInt(productIds[i]);
                 int quantity = Integer.parseInt(quantities[i]);
