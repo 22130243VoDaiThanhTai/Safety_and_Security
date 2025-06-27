@@ -14,7 +14,7 @@
                 <h5>Số lượng sản phẩm: ${cart.getNumberOfItems()}</h5>
                 <h5>Tổng tiền: <strong><fmt:formatNumber value="${cart.getTotal()}" pattern="#,###"/> VNĐ</strong></h5>
                 <hr>
-                
+
                     <div class="cart-row d-flex justify-content-between">
                         <div style="flex:1"><strong>ID</strong></div>
                         <div style="flex:2"><strong>Hình ảnh</strong></div>
@@ -22,7 +22,7 @@
                         <div style="flex:1"><strong>Số lượng</strong></div>
                         <div style="flex:1"><strong>Tổng Giá</strong></div>
                     </div>
-                                    
+
                 <c:forEach var="item" items="${cart.items}">
                     <div class="cart-row">
                         <div style="flex:3"><strong>${item.product.id}</strong></div>
@@ -37,7 +37,7 @@
                 </c:forEach>
             </div>
         </div>
-        
+
         <div class="col-lg-4">
             <div class="box-element" id="form-wrapper">
                 <form id="form" action="checkout" method="post">
@@ -65,6 +65,13 @@
                             <label class="form-label" for="form3Example1c">Số điện thoại:</label> <br>
                             <input class="form-control" type="text" name="phone" value="${user.phone}" placeholder="${user.phone}">
                         </div>
+                        <div class="mb-3">
+                            <label for="privateKey" class="form-label">Nhập khóa kí đơn hàng:</label>
+                            <input name="privateKey" id="privateKey" class="form-control" rows="4" placeholder="Dán khóa riêng vào đây..."></input>
+                            <button type="button" class="btn btn-sm btn-primary mt-2" onclick="validatePrivateKey()">Xác nhận khóa</button>
+                            <p id="keyStatus" class="mt-1"></p>
+                        </div>
+
                     </div>
 
                     <hr>
@@ -83,4 +90,59 @@
             <br>
         </div>
     </div>
+
 </div>
+<script>
+        let isKeyValid = false; // ✅ Biến toàn cục để kiểm tra
+
+
+        function validatePrivateKey() {
+            console.log(isKeyValid)
+            const key = document.getElementById("privateKey").value.trim();
+            const status = document.getElementById("keyStatus");
+            console.log(key)
+            console.log(status)
+
+            fetch("/MixiShop/validateKey", {
+            method: "POST",
+            headers: {
+            "Content-Type": "application/json"
+        },
+            body: JSON.stringify({privateKey: key})
+        })
+            .then(res => res.json())
+            .then(result => {
+                console.log(result.valid + "ét ét")
+                if (result.valid) {
+                    status.innerText = "✅ Khóa hợp lệ.";
+                    status.style.color = "green";
+                    isKeyValid = true;
+                } else {
+                    status.innerText = "❌ Khóa không hợp lệ.";
+                    status.style.color = "red";
+                    isKeyValid = false;
+                }
+        })
+            .catch(error => {
+            console.error("Lỗi xác minh khóa:", error);
+            status.innerText = "❌ Lỗi xác minh khóa.";
+            status.style.color = "red";
+            isKeyValid = false;
+        });
+
+            // ❌ Tránh reload form nếu chỉ nhấn nút "Xác nhận khóa"
+            return false;
+        }
+
+            // ✅ Bắt sự kiện submit form
+            document.addEventListener("DOMContentLoaded", function () {
+            const form = document.getElementById("form");
+            form.addEventListener("submit", function (e) {
+            if (!isKeyValid) {
+            e.preventDefault(); // ❌ Ngăn submit
+            alert("Vui lòng xác nhận khóa hợp lệ trước khi đặt hàng!");
+            }
+        });
+    });
+
+</script>

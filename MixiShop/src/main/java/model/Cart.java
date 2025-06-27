@@ -1,5 +1,8 @@
 package model;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -79,4 +82,27 @@ public class Cart {
         }
         return 0;
     }
+    public String cartToJson(Cart cart, Account account, String address, String phone) {
+        JsonArray itemsArray = new JsonArray();
+        for (Item item : cart.getItems()) {
+            JsonObject itemJson = new JsonObject();
+            itemJson.addProperty("productId", item.getProduct().getId());
+            itemJson.addProperty("productName", item.getProduct().getName());
+            itemJson.addProperty("quantity", item.getQuantity());
+            itemJson.addProperty("price", item.getPrice());
+            itemsArray.add(itemJson);
+        }
+
+        JsonObject json = new JsonObject();
+        json.add("items", itemsArray);
+        json.addProperty("total", cart.getTotal());
+        json.addProperty("address", address);
+        json.addProperty("phone", phone);
+        json.addProperty("userId", account.getId());
+        json.addProperty("username", account.getUsername());
+
+        return json.toString();
+    }
+
+
 }
