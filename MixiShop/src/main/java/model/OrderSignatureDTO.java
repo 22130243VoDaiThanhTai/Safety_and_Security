@@ -9,6 +9,7 @@ public class OrderSignatureDTO {
     private String phone;
     private int userId;
     private String username;
+    private String signature;
 
     public OrderSignatureDTO(List<OrderItemDTO> items, double total, String address, String phone, int userId, String username) {
         this.items = items;
@@ -17,6 +18,9 @@ public class OrderSignatureDTO {
         this.phone = phone;
         this.userId = userId;
         this.username = username;
+    }
+    public void setSignature(String signature) {
+        this.signature = signature;
     }
 
     // Getters & Setters

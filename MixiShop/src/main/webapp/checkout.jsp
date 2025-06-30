@@ -71,8 +71,12 @@
                             <button type="button" class="btn btn-sm btn-primary mt-2" onclick="validatePrivateKey()">Xác nhận khóa</button>
                             <p id="keyStatus" class="mt-1"></p>
                         </div>
+                        <div class="mb-3">
+                            <a href="generateKey">Chưa có khóa? Nhấn vào đây</a>
+                        </div>
 
                     </div>
+
 
                     <hr>
                     <c:forEach var="item" items="${cart.items}">
@@ -85,6 +89,7 @@
                     <br>
 
                 </form>
+
             </div>
 
             <br>
@@ -114,23 +119,23 @@
             .then(result => {
                 console.log(result.valid + "ét ét")
                 if (result.valid) {
-                    status.innerText = "✅ Khóa hợp lệ.";
+                    status.innerText = "Khóa hợp lệ.";
                     status.style.color = "green";
                     isKeyValid = true;
                 } else {
-                    status.innerText = "❌ Khóa không hợp lệ.";
+                    status.innerText = "Khóa không hợp lệ.";
                     status.style.color = "red";
                     isKeyValid = false;
                 }
         })
             .catch(error => {
             console.error("Lỗi xác minh khóa:", error);
-            status.innerText = "❌ Lỗi xác minh khóa.";
+            status.innerText = "Lỗi xác minh khóa.";
             status.style.color = "red";
             isKeyValid = false;
         });
 
-            // ❌ Tránh reload form nếu chỉ nhấn nút "Xác nhận khóa"
+
             return false;
         }
 
@@ -139,7 +144,7 @@
             const form = document.getElementById("form");
             form.addEventListener("submit", function (e) {
             if (!isKeyValid) {
-            e.preventDefault(); // ❌ Ngăn submit
+            e.preventDefault();
             alert("Vui lòng xác nhận khóa hợp lệ trước khi đặt hàng!");
             }
         });

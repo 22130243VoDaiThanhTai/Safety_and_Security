@@ -24,7 +24,7 @@ public class LoginController extends HttpServlet {
 
 	// Google OAuth
 	private static final String CLIENT_ID = "907964223254-9j5im6uvq8ic45o8569o2bt40kkivam3.apps.googleusercontent.com";
-	private static final String REDIRECT_URI = "http://localhost:8080/oauth2callback";
+	private static final String REDIRECT_URI = "http://localhost:8080/MixiShop/oauth2callback";
 	private static final String SCOPE = "https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile";
 
 	@Override

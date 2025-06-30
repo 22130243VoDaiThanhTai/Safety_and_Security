@@ -19,7 +19,7 @@ public class GoogleCallbackController extends HttpServlet {
 
     private static final String CLIENT_ID = "907964223254-9j5im6uvq8ic45o8569o2bt40kkivam3.apps.googleusercontent.com";
     private static final String CLIENT_SECRET = "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";
-    private static final String REDIRECT_URI = "http://localhost:8080/oauth2callback";
+    private static final String REDIRECT_URI = "http://localhost:8080/MixiShop/oauth2callback";
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -95,7 +95,7 @@ public class GoogleCallbackController extends HttpServlet {
 
         // Kiểm tra trạng thái xác minh email
         if (existingAccount.getStatus() == 0) {
-            String verificationLink = "http://localhost:8080/verify?email=" + URLEncoder.encode(email, "UTF-8");
+            String verificationLink = "http://localhost:8080/MixiShop/verify?email=" + URLEncoder.encode(email, "UTF-8");
             String messageText = "Chào " + name + ",\n\nVui lòng xác minh email của bạn bằng cách nhấp vào liên kết sau:\n" + verificationLink;
 
             try {

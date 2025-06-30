@@ -56,8 +56,10 @@ public class CheckoutController extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         // Đặt mã hóa UTF-8 cho HTTP response
-        response.setContentType("text/html; charset=UTF-8");
+        request.setCharacterEncoding("UTF-8");
         response.setCharacterEncoding("UTF-8");
+        response.setContentType("application/json; charset=UTF-8");
+
         String name = request.getParameter("name");
         String email = request.getParameter("email");
         String address = request.getParameter("address");
@@ -69,7 +71,7 @@ public class CheckoutController extends HttpServlet {
         String orderJson = cart.cartToJson(cart, account, address, phone);
 
 // In ra chuỗi JSON đơn hàng
-        System.out.println("✅ Chuỗi JSON đơn hàng để ký:");
+        System.out.println("Chuỗi JSON đơn hàng để ký:");
         System.out.println(orderJson);
         String privateKeyBase64 = request.getParameter("privateKey");
         System.out.println(privateKeyBase64 + " privatekey nè");
@@ -144,11 +146,15 @@ public class CheckoutController extends HttpServlet {
 
             session.setAttribute("cart", cart);
 
-            String successScript = "<script>"
-                    + "alert('Đặt hàng thành công');"
-                    + "window.location.href = 'orders';"
-                    + "</script>";
-            response.getWriter().write(successScript);
+            request.getSession().setAttribute("message", "Đặt hàng thành công");
+            response.sendRedirect("orders");
+
+
+//            String successScript = "<script>"
+//                    + "alert('Đặt hàng thành công');"
+//                    + "window.location.href = 'orders';"
+//                    + "</script>";
+//            response.getWriter().write(successScript);
 
         } catch (Exception e) {
             Order order = new Order(cart, name, address, phone);

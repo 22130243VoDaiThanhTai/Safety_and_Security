@@ -1,5 +1,7 @@
 package model;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
@@ -83,25 +85,28 @@ public class Cart {
         return 0;
     }
     public String cartToJson(Cart cart, Account account, String address, String phone) {
-        JsonArray itemsArray = new JsonArray();
+        List<OrderItemDTO> items = new ArrayList<>();
         for (Item item : cart.getItems()) {
-            JsonObject itemJson = new JsonObject();
-            itemJson.addProperty("productId", item.getProduct().getId());
-            itemJson.addProperty("productName", item.getProduct().getName());
-            itemJson.addProperty("quantity", item.getQuantity());
-            itemJson.addProperty("price", item.getPrice());
-            itemsArray.add(itemJson);
+            items.add(new OrderItemDTO(
+                    item.getProduct().getId(),
+                    item.getProduct().getName(),
+                    item.getQuantity(),
+                    (double) item.getPrice()  // đảm bảo là double
+            ));
         }
 
-        JsonObject json = new JsonObject();
-        json.add("items", itemsArray);
-        json.addProperty("total", cart.getTotal());
-        json.addProperty("address", address);
-        json.addProperty("phone", phone);
-        json.addProperty("userId", account.getId());
-        json.addProperty("username", account.getUsername());
+        OrderSignatureDTO orderDTO = new OrderSignatureDTO(
+                items,
+                (double) cart.getTotal(),  // đảm bảo là double
+                address,
+                phone,
+                account.getId(),
+                account.getUsername()
+        );
 
-        return json.toString();
+        Gson gson = new GsonBuilder().disableHtmlEscaping().create(); // dùng chung config
+        return gson.toJson(orderDTO);
+
     }
 
 
