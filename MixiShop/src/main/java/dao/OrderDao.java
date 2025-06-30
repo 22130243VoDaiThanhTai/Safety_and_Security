@@ -5,18 +5,18 @@ import com.google.gson.GsonBuilder;
 import database.DatabaseConnection;
 import model.*;
 
+import java.security.KeyFactory;
+import java.security.PublicKey;
+import java.security.spec.X509EncodedKeySpec;
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class OrderDao {
     Connection connect = null;
     PreparedStatement ps = null;
     ResultSet rs = null;
     private ProductDAO productDAO = new ProductDAO();
-    DS ds = new DS();
+    static DS ds = new DS();
     public int createOrder(int userId, String email, String phone, String address, double totalPrice) throws SQLException {
         int orderId = -1;
 
@@ -250,10 +250,91 @@ public class OrderDao {
         Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
         return gson.toJson(orderJsonList);
     }
+    public static PublicKey getPublicKeyForUser(int userId, Connection conn) {
+        try {
+            String sql = "SELECT public_key FROM rsa_keys WHERE user_id = ? AND is_active = 1 LIMIT 1";
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setInt(1, userId);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                String publicKeyBase64 = rs.getString("public_key");
+                byte[] keyBytes = Base64.getDecoder().decode(publicKeyBase64);
+                X509EncodedKeySpec keySpec = new X509EncodedKeySpec(keyBytes);
+                KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+                return keyFactory.generatePublic(keySpec);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 
 
-    public static void main(String[] args) throws SQLException {
+    public static Map<Integer, Boolean> verifyOrderIntegrity() throws Exception {
+        Map<Integer, Boolean> resultMap = new HashMap<>();
+        Connection conn = DatabaseConnection.getConnection();
+
+        String sql = "SELECT o.id AS order_id, o.total_price, o.address, o.phone, o.user_id, a.username, o.signature " +
+                "FROM orders o JOIN account a ON o.user_id = a.id";
+        PreparedStatement ps = conn.prepareStatement(sql);
+        ResultSet rs = ps.executeQuery();
+
+        Gson gson = new GsonBuilder().disableHtmlEscaping().create(); // giống hệt bên ký
+
+        while (rs.next()) {
+            int orderId = rs.getInt("order_id");
+            double total = rs.getDouble("total_price");
+            String address = rs.getString("address");
+            String phone = rs.getString("phone");
+            int userId = rs.getInt("user_id");
+            String username = rs.getString("username");
+            String signature = rs.getString("signature");
+
+            // ✅ Lấy đúng public key người dùng
+            PublicKey publicKey = getPublicKeyForUser(userId, conn);
+            if (publicKey == null) {
+                resultMap.put(orderId, false);
+                continue;
+            }
+
+            // ✅ Tạo lại danh sách sản phẩm
+            List<OrderItemDTO> items = new ArrayList<>();
+            String detailSql = "SELECT p.id AS product_id, p.name AS product_name, od.quantity, od.price " +
+                    "FROM order_details od JOIN product p ON od.product_id = p.id WHERE od.order_id = ?";
+            PreparedStatement psDetail = conn.prepareStatement(detailSql);
+            psDetail.setInt(1, orderId);
+            ResultSet rsDetail = psDetail.executeQuery();
+
+            while (rsDetail.next()) {
+                items.add(new OrderItemDTO(
+                        rsDetail.getInt("product_id"),
+                        rsDetail.getString("product_name"),
+                        rsDetail.getInt("quantity"),
+                        rsDetail.getDouble("price")
+                ));
+            }
+
+            // ✅ Build lại JSON giống lúc ký
+            OrderSignatureDTO orderDTO = new OrderSignatureDTO(items, total, address, phone, userId, username);
+            String recreatedJson = gson.toJson(orderDTO);
+            System.out.println("🔍 JSON  xác minh:\n" + recreatedJson);
+
+
+            // ✅ Xác minh chữ ký
+            boolean isValid = ds.verifySignature(recreatedJson, signature, publicKey);
+            resultMap.put(orderId, isValid);
+        }
+
+        conn.close();
+        return resultMap;
+    }
+
+
+
+
+    public static void main(String[] args) throws Exception {
         System.out.println(getAllOrderSignatureJson());
+        System.out.println(verifyOrderIntegrity());
     }
 
 

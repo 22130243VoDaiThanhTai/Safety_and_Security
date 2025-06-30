@@ -61,6 +61,7 @@
     }
 </style>
 <body>
+
 <c:if test="${not empty message}">
     <script>
         alert("${message}");
@@ -88,7 +89,11 @@
         <!-- Nội dung chính (chiếm 9 cột) -->
         <div class="col-md-9 p-4 text-center">
             <h1>Danh sách đơn hàng</h1><br>
-
+            <c:if test="${not empty alertMessage}">
+                <div class="alert alert-warning text-start" role="alert" style="font-size: 16px;">
+                    <strong>Cảnh báo:</strong> ${alertMessage}
+                </div>
+            </c:if>
             <c:choose>
                 <c:when test="${not empty listOrder}">
                     <div class="row justify-content-start">
@@ -125,11 +130,16 @@
                                         </a>
                                     </td>
                                     <td>
-                                        <!-- Có thể thêm nút xem chi tiết đơn hàng -->
-                                        <a href="" class="btn btn-info btn-sm" data-order-id="${order.orderId}">
-                                            Xác nhận
-                                        </a>
+                                        <c:choose>
+                                            <c:when test="${orderVerifyMap[order.orderId]}">
+                                                <button class="btn btn-success btn-sm">Xác nhận</button>
+                                            </c:when>
+                                            <c:otherwise>
+                                                <button class="btn btn-danger btn-sm">Chưa xác nhận</button>
+                                            </c:otherwise>
+                                        </c:choose>
                                     </td>
+
                                 </tr>
                             </c:forEach>
                             </tbody>
@@ -180,3 +190,5 @@
 <%--còn lỗi lấy orderId với lỗi hiển thị đơn hàng chi tiết--%>
 
 </body>
+
+

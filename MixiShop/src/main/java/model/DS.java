@@ -1,5 +1,6 @@
 package model;
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.security.*;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
@@ -76,35 +77,20 @@ public class DS {
         PrivateKey privateKey = factory.generatePrivate(spec);
         Signature signature = Signature.getInstance("SHA256withRSA");
         signature.initSign(privateKey);
-        signature.update(data.getBytes("UTF-8")); // Đảm bảo dùng UTF-8 cho nhất quán
+        signature.update(data.getBytes(StandardCharsets.UTF_8));
 
         byte[] signedBytes = signature.sign();
         return Base64.getEncoder().encodeToString(signedBytes);
     }
-    public String signFile(String src) throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, SignatureException, IOException {
-        Signature s = Signature.getInstance("SHA1withRSA");
-        s.initSign(this.privateKey);
-
-        BufferedInputStream bis= new BufferedInputStream(new FileInputStream(src));
-        int i;
-        byte[] read= new byte[1024];
-        while ((i=bis.read(read))!=-1) {
-            s.update(read,0,i);
-        }
-        byte[] sign = s.sign();
-
-
-        return Base64.getEncoder().encodeToString(sign);
-    }
 
     public boolean verify(String data, String sign) throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, SignatureException {
-        Signature s = Signature.getInstance("SHA1withRSA");
+        Signature s = Signature.getInstance("SHA256withRSA");
         s.initVerify(publicKey);
         s.update(data.getBytes());
         return  s.verify(Base64.getDecoder().decode(sign));
     }
     public boolean verifyFile(String src, String sign) throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, SignatureException, IOException {
-        Signature s = Signature.getInstance("SHA1withRSA");
+        Signature s = Signature.getInstance("SHA256withRSA");
         s.initVerify(publicKey);
         BufferedInputStream bis= new BufferedInputStream(new FileInputStream(src));
         int i;
@@ -114,6 +100,25 @@ public class DS {
         }
         return  s.verify(Base64.getDecoder().decode(sign));
     }
+
+
+
+
+    public  boolean verifySignature(String jsonData, String signatureBase64, PublicKey publicKey) {
+        try {
+            Signature signature = Signature.getInstance("SHA256withRSA");
+            signature.initVerify(publicKey);
+            signature.update(jsonData.getBytes(StandardCharsets.UTF_8));
+            byte[] sigBytes = Base64.getDecoder().decode(signatureBase64);
+            return signature.verify(sigBytes);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+
+
 
     public static void main(String[] args) throws Exception {
         String s = "CNTT";

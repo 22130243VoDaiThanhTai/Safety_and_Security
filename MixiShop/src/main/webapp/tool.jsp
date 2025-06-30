@@ -69,6 +69,10 @@
 
         </div>
     </c:if>
+    <div class="text-center mt-4">
+        <a href="checkout" class="btn btn-secondary">Quay về trang mua hàng</a>
+    </div>
+
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>

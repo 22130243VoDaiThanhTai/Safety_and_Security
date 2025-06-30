@@ -106,7 +106,7 @@
 									<li><a class="dropdown-item" href="orders"><i class="fa-solid fa-truck-fast"></i> Đơn hàng</a></li>
 									<li><a class="dropdown-item" href="logout"><i class="fa-solid fa-right-from-bracket"></i> Đăng xuất</a></li>
 								</ul></li>
-							<a href="generateKey">tool</a>
+
 							<!-- Kiểm tra role của người dùng và hiển thị trang ADMIN nếu role = 0 -->
 							<c:if test="${sessionScope.account.role == 0}">
 								<li class="nav-item"><a class="nav-link" href="admin">Trang

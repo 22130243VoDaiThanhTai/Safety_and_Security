@@ -37,11 +37,11 @@ public class getOrderDetails extends HttpServlet {
 
 
         int orderId = Integer.parseInt(request.getParameter("orderId"));
-        System.out.println("CON CU" + orderId);
+        System.out.println(  orderId);
         List<OrderDetail> details = null;
         try {
             details = orderDao.getOrderDetails(orderId);
-            System.out.println("CON CU");
+
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
